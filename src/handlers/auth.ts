@@ -1,0 +1,57 @@
+import { Request, Response } from 'express';
+import { checkUserExist, createNewUser } from '../services/users-queries';
+import { SessionData } from 'express-session';
+
+
+// Define a custom interface that extends SessionData
+interface CustomSessionData extends SessionData {
+    user?: {
+        email: string;
+        type: 'normal';
+    }; // Define the type of the user object
+}
+
+
+// function to handle user login
+const logInHandler = async (req: Request, res: Response) => {
+    console.log('testing session storage', req.session);
+
+    const { email, password } = req.body;
+    const response: [{ password: string }] = await checkUserExist(email);
+
+    if (response.length > 0 && response[0].password === password) {
+        (req.session as CustomSessionData).user = {
+            email: email,
+            type: 'normal',
+        }
+        return res.status(200).json({ message: 'logged in succesfully' });
+    };
+
+    res.status(404).json({ message: 'user with cridentials not found' });
+};
+
+
+
+// function to handle creating of new accont 
+const createAccountHandler = async (req: Request, res: Response) => {
+    const { firstName, lastName, email, password, gender } = req.body;
+    const response: [{ password: string }] = await checkUserExist(email);
+
+    if (response.length > 0) {
+        return res.status(201).json({ message: 'user exist' });
+    };
+
+    const created: boolean = await createNewUser(firstName, lastName, email, password, gender);
+    console.log(created, 'createdddddd');
+
+    if (created) {
+        (req.session as CustomSessionData).user = {
+            email: email,
+            type: 'normal',
+        };
+        return res.json({ message: 'account created successfully' });
+    };
+    res.status(500).json({ message: 'An error occured trying to create acount' });
+};
+
+export { logInHandler, createAccountHandler };
