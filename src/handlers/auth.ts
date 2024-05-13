@@ -1,15 +1,6 @@
 import { Request, Response } from 'express';
 import { checkUserExist, createNewUser } from '../services/users-queries';
-import { SessionData } from 'express-session';
-
-
-// Define a custom interface that extends SessionData
-interface CustomSessionData extends SessionData {
-    user?: {
-        email: string;
-        type: 'normal';
-    }; // Define the type of the user object
-}
+import { CustomSessionData } from './../types/session-types';
 
 
 // function to handle user login
@@ -38,7 +29,7 @@ const createAccountHandler = async (req: Request, res: Response) => {
     const response: [{ password: string }] = await checkUserExist(email);
 
     if (response.length > 0) {
-        return res.status(201).json({ message: 'user exist' });
+        return res.status(409).json({ message: 'user exist' });
     };
 
     const created: boolean = await createNewUser(firstName, lastName, email, password, gender);

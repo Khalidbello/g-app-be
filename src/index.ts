@@ -3,7 +3,7 @@
 import express, { Request, Response, NextFunction, } from 'express';
 import auth from './routes/auth';
 import admin from './routes/admin';
-import order from './routes/order';
+import users from './routes/users';
 import cors from 'cors';
 import session from 'express-session';
 import { initiateConnection } from './modules/connectdb';
@@ -45,7 +45,7 @@ app.use(express.static('public'));
 
 app.use('/auth', auth);
 app.use('/admin', admin);
-app.use('/order', order);
+app.use('/users', users);
 
 
 // Define a route handler for the root path
