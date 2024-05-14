@@ -8,14 +8,18 @@ import { checkUserExist } from "../services/users-queries";
 
 const getVAccDetails = async (req: Request, res: Response) => {
     const email = (req.session as CustomSessionData).user?.email;
-    const details: vAccountType = await getAcc(email);
 
-    console.log(details, 'below wait');
-    if (!details?.account_name) {
-        return res.status(404).json({ message: 'virtual account not found' });
-    } else {
-        res.status(200).json(details);
-    };
+    try {
+        const details: vAccountType = await getAcc(email);
+
+        if (!details?.account_name) {
+            return res.status(404).json({ message: 'virtual account not found' });
+        } else {
+            res.status(200).json(details);
+        };
+    } catch (err) {
+        res.status(500).json({ message: err });
+    }
 };
 
 
