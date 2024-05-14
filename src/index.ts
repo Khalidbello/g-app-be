@@ -1,5 +1,5 @@
 // entry file for g-app back end
-
+import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction, } from 'express';
 import auth from './routes/auth';
 import admin from './routes/admin';
@@ -13,7 +13,8 @@ import { initiateConnection } from './modules/connectdb';
 const app = express();
 const port = process.env.PORT || 8000;
 
-
+// load environmental variables
+dotenv.config();
 
 //locking in middlewares
 const corsOptions = {
@@ -30,7 +31,7 @@ const sessionOptions = {
         httpOnly: true, // Ensures cookies are only accessible via HTTP(S) and not client-side scripts
         maxAge: 0.5 * 60 * 60 * 1000, // Session expiration time in milliseconds (e.g., 1 day)
     },
-}; 
+};
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

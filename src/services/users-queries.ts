@@ -1,11 +1,12 @@
 import pool from '../modules/connectdb';
+import { checkUserExistType } from '../types/general';
 
 
 // function to check if user exists
-const checkUserExist = async (email: string): Promise<[{ password: string }]> => {
-    return new Promise<[{ password: string }]>((resolve, reject) => {
+const checkUserExist = async (email: string | undefined): Promise<[checkUserExistType]> => {
+    return new Promise<[checkUserExistType]>((resolve, reject) => {
         // Use parameterized query to prevent SQL injection
-        const query = 'SELECT password FROM users WHERE email = ?';
+        const query = 'SELECT password, first_name, last_name, gender  FROM users WHERE email = ?';
 
         pool.query(query, [email], (err, result) => {
             if (err) {
