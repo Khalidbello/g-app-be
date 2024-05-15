@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { getVAccDetails, createVAcc } from './../handlers/virtual-account';
 import { CustomSessionData } from './../types/session-types';
-import { createDOrder, getDOrders, removeDOrder } from '../handlers/defined-orders';
+import { createDOrder, getDOrders, removeDOrder } from './../handlers/defined-orders';
+import { initiateNewOrder, getOrderById, getOrders } from './../handlers/orders';
 
 
 const router = Router();
@@ -20,57 +21,40 @@ router.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 
+
+
+//==================================================================================================
+// route related to virtual account
+
 // route to return user virtual account details
-router.get('/v-account-details', (req: Request, res: Response) => {
-    try {
-        getVAccDetails(req, res);
-    } catch (err) {
-        console.log('error in get v account details..', err);
-        res.status(500).json({ messag: err });
-    }
-});
+router.get('/v-account-details', (req: Request, res: Response) => getVAccDetails(req, res));
 
 // route for creating vietual  account
-router.post('/create-v-acc', (req: Request, res: Response) => {
-    try {
-        createVAcc(req, res);
-    } catch (err) {
-        console.log('error in create-v-acc....', err);
-        res.status(500).json({ messag: err })
-    };
-});
+router.post('/create-v-acc', (req: Request, res: Response) => createVAcc(req, res));
 
+
+
+//==========================================================================================================
+// route related to defined orders
 
 // route for creating vietual  account
-router.post('/create-d-order', (req: Request, res: Response) => {
-    try {
-        createDOrder(req, res);
-    } catch (err) {
-        console.log('error in create-d-order....', err);
-        res.status(500).json({ messag: err })
-    };
-});
+router.post('/create-d-order', (req: Request, res: Response) => createDOrder(req, res));
 
-
-
-router.delete('/delete-d-order/:id', (req: Request, res: Response) => {
-    try {
-        removeDOrder(req, res);
-    } catch (err) {
-        console.log('error in delete d order....', err);
-        res.status(500).json({ messag: err })
-    };
-});
+router.delete('/delete-d-order/:id', (req: Request, res: Response) => removeDOrder(req, res));
 
 // rote to get defined orders
-router.get('/defined-orders/:count/:limit', (req: Request, res: Response) => {
-    try {
-        getDOrders(req, res);
-    } catch (err) {
-        console.log('error in defined orders....', err);
-        res.status(500).json({ messag: err })
-    };
-});
+router.get('/defined-orders/:count/:limit', (req: Request, res: Response) => getDOrders(req, res));
+
+
+
+//=========================================================================================================
+// route related to orders
+
+router.post('/create-order', (req: Request, res: Response) => initiateNewOrder(req, res));
+
+router.get('/get-order-by-id/:id', (req: Request, res: Response) => getOrderById(req, res));
+
+router.get('/orders/:count/:limit', (req: Request, res: Response) => getOrders(req, res));
 
 
 export default router
