@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CustomSessionData } from './../types/session-types';
 import { getAcc, updateBalance } from "./../services/v-acc-queries";
-import { addNewOrder, getPlacedOrders } from './../services/order-queries';
+import { addNewOrder, getPlacedOrders, queryOrderById } from './../services/order-queries';
 
 const gurasaP = 200;
 const suyaP = 100;
@@ -27,16 +27,18 @@ const initiateNewOrder = async (req: Request, res: Response) => {
 
         // @ts-ignore
         const balanceUpdated: boolean = await updateBalance(newBalance, email);
-        payment_date = new Date();
+        payment_date = new Date(); console.log(payment_date, 'paymnt date...........');
 
         if (balanceUpdated !== true) throw 'error updating balance';
 
         // add order to database
         const order_id = 'NVDSVVNEUN1234N5669' // call functio to create new ordr id
         // @ts-ignore
-        const response = await addNewOrder(email, 'Paid', gurasa, suya, price, created_date, order_id);
+        const response = await addNewOrder(email, 'paid', gurasa, suya, price, created_date, payment_date, order_id);
 
-        if (response === true) return res.json({ message: 'order created succesfully' });
+
+        //@ts-ignore
+        if (response.affectedRows > 0) return res.json({ id: response.insertId });
 
         throw 'error creating order please report issue';
     } catch (error) {
@@ -44,11 +46,16 @@ const initiateNewOrder = async (req: Request, res: Response) => {
     };
 };
 
-const getOrderById = (req: Request, res: Response) => {
+const getOrderById = async (req: Request, res: Response) => {
     try {
+        const email = (req.session as CustomSessionData).user?.email;
+        const id = parseInt(req.params.id);
 
+        const order = await queryOrderById(email, id);
+
+        res.json({ data: order })
     } catch (error) {
-
+        res.status(500).json({ message: error });
     }
 };
 
@@ -59,7 +66,7 @@ const getOrders = async (req: Request, res: Response) => {
         const count: number = parseInt(req.params.count);
 
         const orders = await getPlacedOrders(email, limit, count);
-        res.json({data: orders, message: 'order fetched succesfully'});
+        res.json({ data: orders, message: 'order fetched succesfully' });
     } catch (error) {
         res.status(500).json({ message: error });
     }

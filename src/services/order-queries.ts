@@ -56,17 +56,17 @@ const deleteDOrder = (id: number, email: string | undefined): Promise<boolean> =
 
 
 // query to add a new order to the database
-const addNewOrder = (user: string, status: string, gurasa: number, suya: number, price: number, created_date: Date, order_id: string) => {
-    return new Promise<boolean>((resolve, reject) => {
-        const query = 'INSERT INTO orders (user, status, gurasa, suya, price, created_date, order_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+const addNewOrder = (user: string, status: string, gurasa: number, suya: number, price: number, created_date: Date, payment_date: Date, order_id: string): Promise<{ [keys: string]: string }> => {
+    return new Promise<{ [keys: string]: string }>((resolve, reject) => {
+        const query = 'INSERT INTO orders (user, status, gurasa, suya, price, created_date, payment_date, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-        pool.query(query, [user, status, gurasa, suya, price, created_date, order_id], (err, result) => {
+        pool.query(query, [user, status, gurasa, suya, price, created_date, payment_date, order_id], (err, result) => {
             if (err) {
                 console.log('an error ocured fetching defined order', err)
                 reject(err);
             } else {
                 console.log(result);
-                resolve(result.affectedRows > 0);
+                resolve(result);
             }
         })
     })
@@ -90,4 +90,19 @@ const getPlacedOrders = (email: string | undefined, limit: number, count: number
     })
 };
 
-export { saveDOrder, retrieveDOrder, deleteDOrder, addNewOrder, getPlacedOrders };
+const queryOrderById = (email: string | undefined, id: number): Promise<{ [keys: string]: string }> => {
+    return new Promise<{ [keys: string]: string }>((resolve, reject) => {
+        const query = 'SELECT status, order_id, gurasa, suya, price, created_date, id, payment_date, bagged_date, deliver_date FROM orders WHERE user = ? AND id = ?';
+
+        pool.query(query, [email, id], (err, result) => {
+            if (err) {
+                console.log('an error ocured fetching defined order', err)
+                reject(err);
+            } else {
+                console.log(result);
+                resolve(result);
+            }
+        })
+    })
+}
+export { saveDOrder, retrieveDOrder, deleteDOrder, addNewOrder, getPlacedOrders, queryOrderById };
