@@ -4,6 +4,7 @@ import { CustomSessionData } from './../types/session-types';
 import { createDOrder, getDOrders, removeDOrder } from '../handlers/users/defined-orders';
 import { initiateNewOrder, getOrderById, getOrders } from '../handlers/users/orders';
 import { confirmEmailOtp, generateConfirmEmailOtp, getCheckEmailVerify } from '../handlers/users/email-verification';
+import { handleChangePassword } from '../handlers/users/profile';
 
 
 const router = Router();
@@ -69,9 +70,9 @@ router.post('/confirm-email-otp', (req: Request, res: Response) => confirmEmailO
 
 router.post('/send-email-confirm-otp', (req: Request, res: Response) => generateConfirmEmailOtp(req, res));
 
-// router.post('/change-password', (req: Request, res: Response) => handleChangePassword(req, res));
+router.post('/change-password', (req: Request, res: Response) => handleChangePassword(req, res));
 
-// router.post('/change-names', (req: Request, res: Response) => handleChangeNames(req, res));
+//router.post('/change-names', (req: Request, res: Response) => handleChangeNames(req, res));
 
 // router.get('/user-dp', (req: Request, res: Response) => getUserDp(req, res));
 
