@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { getAcc, saveVAcc } from './../services/v-acc-queries';
 import { CustomSessionData } from "../types/session-types";
 import { checkUserExistType, vAccountType } from '../types/general';
-import { checkUserExist } from "../services/users-queries";
+import { checkUserExist } from "../services/users/users-queries";
 
 const getVAccDetails = async (req: Request, res: Response) => {
     const email = (req.session as CustomSessionData).user?.email;
@@ -33,9 +33,9 @@ const createVAcc = async (req: Request, res: Response) => {
     console.log('in create v accont');
     try {
         // get user first name and last name
-        const user: [checkUserExistType] = await checkUserExist(email);
+        const user = await checkUserExist(email);
 
-        if (user.length < 1) return res.status(404).json({ message: 'user details not found' });
+        if (!user) return res.status(404).json({ message: 'user details not found' });
 
         const flw = new Flutterwave(process.env.FLWPTK, process.env.FLWSTK);
         const payload = {

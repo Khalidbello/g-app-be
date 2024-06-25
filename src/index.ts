@@ -1,5 +1,7 @@
-// entry file for g-app back end
-import dotenv from 'dotenv';
+
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response, NextFunction, } from 'express';
 import auth from './routes/auth';
 import admin from './routes/admin';
@@ -13,8 +15,6 @@ import { initiateConnection } from './modules/connectdb';
 const app = express();
 const port = process.env.PORT || 8000;
 
-// load environmental variables
-dotenv.config();
 
 //locking in middlewares
 const corsOptions = {

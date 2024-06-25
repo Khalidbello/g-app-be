@@ -1,6 +1,6 @@
 import { Request, Response } from "express-serve-static-core";
-import { CustomSessionData } from './../types/session-types';
-import { saveDOrder, retrieveDOrder, deleteDOrder } from "../services/order-queries";
+import { CustomSessionData } from "../../types/session-types";
+import { deleteDOrder, saveDOrder } from "../../services/users/order-queries";
 
 
 // handler for defined ordr creation

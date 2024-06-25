@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { CustomSessionData } from './../types/session-types';
-import { getAcc, updateBalance } from "./../services/v-acc-queries";
-import { addNewOrder, getPlacedOrders, queryOrderById } from './../services/order-queries';
+import { CustomSessionData } from '../../types/session-types';
+import { getAcc, updateBalance } from "../../services/v-acc-queries";
+import { addNewOrder, getPlacedOrders, queryOrderById } from '../../services/users/order-queries';
 
 const gurasaP = 200;
 const suyaP = 100;

@@ -1,8 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { getVAccDetails, createVAcc } from './../handlers/virtual-account';
 import { CustomSessionData } from './../types/session-types';
-import { createDOrder, getDOrders, removeDOrder } from './../handlers/defined-orders';
-import { initiateNewOrder, getOrderById, getOrders } from './../handlers/orders';
+import { createDOrder, getDOrders, removeDOrder } from '../handlers/users/defined-orders';
+import { initiateNewOrder, getOrderById, getOrders } from '../handlers/users/orders';
+import { confirmEmailOtp, generateConfirmEmailOtp, getCheckEmailVerify } from '../handlers/users/email-verification';
 
 
 const router = Router();
@@ -56,5 +57,22 @@ router.get('/get-order-by-id/:id', (req: Request, res: Response) => getOrderById
 
 router.get('/orders/:count/:limit', (req: Request, res: Response) => getOrders(req, res));
 
+
+//========================================================================================================
+// route related to user profile
+
+//router.post('/edit-dp', (req: Request, res: Response) => userDpUpload(req, res));
+
+router.get('/check-email-verify', (req: Request, res: Response) => getCheckEmailVerify(req, res));
+
+router.post('/confirm-email-otp', (req: Request, res: Response) => confirmEmailOtp(req, res));
+
+router.post('/send-email-confirm-otp', (req: Request, res: Response) => generateConfirmEmailOtp(req, res));
+
+// router.post('/change-password', (req: Request, res: Response) => handleChangePassword(req, res));
+
+// router.post('/change-names', (req: Request, res: Response) => handleChangeNames(req, res));
+
+// router.get('/user-dp', (req: Request, res: Response) => getUserDp(req, res));
 
 export default router

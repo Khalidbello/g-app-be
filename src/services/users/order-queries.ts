@@ -1,5 +1,5 @@
 import { query } from "express";
-import pool from "../modules/connectdb";
+import pool from "../../modules/connectdb";
 
 // function to save new defined order
 const saveDOrder = (gurasa: number, suya: number, name: string, email: string | undefined, date: Date): Promise<boolean> => {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { checkUserExist, createNewUser } from '../services/users-queries';
+import { checkUserExist, createNewUser } from '../services/users/users-queries';
 import { CustomSessionData } from './../types/session-types';
 
 
@@ -8,12 +8,14 @@ const logInHandler = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     try {
-        const response: [{ password: string }] = await checkUserExist(email);
+        const response = await checkUserExist(email);
 
-        if (response.length > 0 && response[0].password === password) {
+        console.log('response .......', response)
+        if (response && response.password === password) {
             (req.session as CustomSessionData).user = {
                 email: email,
                 type: 'normal',
+                id: response.id
             }
             return res.status(200).json({ message: 'logged in succesfully' });
         };
@@ -30,22 +32,23 @@ const createAccountHandler = async (req: Request, res: Response) => {
     const { firstName, lastName, email, password, gender } = req.body;
 
     try {
-        const response: [{ password: string }] = await checkUserExist(email);
+        const response = await checkUserExist(email);
 
-        if (response.length > 0) {
+        if (response) {
             return res.status(409).json({ message: 'user exist' });
         };
 
-        const created: boolean = await createNewUser(firstName, lastName, email, password, gender);
-        console.log(created, 'createdddddd');
+        const created = await createNewUser(firstName, lastName, email, password, gender);
 
-        if (created === true) {
+        if (created.affectedRows === 1) {
             (req.session as CustomSessionData).user = {
                 email: email,
                 type: 'normal',
+                id: created.insertId
             };
             return res.json({ message: 'account created successfully' });
         };
+
         throw 'unable to create new user';
     } catch (err) {
         res.status(500).json({ message: 'An error occured trying to create acount' });
