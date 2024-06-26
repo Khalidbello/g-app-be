@@ -26,7 +26,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
-    "flutterwave-node-v3": "^1.1.9",
+    "flutterwave-node-v3": "^1.1.10",
     "formidable": "^3.5.1",
     "handlebars": "^4.7.8",
     "mysql": "^2.18.1",

@@ -10,16 +10,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAccountHandler = exports.logInHandler = void 0;
-const users_queries_1 = require("../services/users-queries");
+const users_queries_1 = require("../services/users/users-queries");
 // function to handle user login
 const logInHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     try {
         const response = yield (0, users_queries_1.checkUserExist)(email);
-        if (response.length > 0 && response[0].password === password) {
+        console.log('response .......', response);
+        if (response && response.password === password) {
             req.session.user = {
                 email: email,
                 type: 'normal',
+                id: response.id
             };
             return res.status(200).json({ message: 'logged in succesfully' });
         }
@@ -27,6 +29,7 @@ const logInHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(404).json({ message: 'user with cridentials not found' });
     }
     catch (err) {
+        console.error('error in login api', err);
         res.status(500).json({ message: err });
     }
     ;
@@ -34,19 +37,21 @@ const logInHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.logInHandler = logInHandler;
 // function to handle creating of new accont 
 const createAccountHandler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { firstName, lastName, email, password, gender } = req.body;
+    const { firstName, lastName, email, phoneNumber, password, gender } = req.body;
+    if (!firstName || !lastName || !email || !phoneNumber || !password || !gender)
+        return res.status(401).json({ message: 'incomplete data sent to server for processing' });
     try {
         const response = yield (0, users_queries_1.checkUserExist)(email);
-        if (response.length > 0) {
+        if (response) {
             return res.status(409).json({ message: 'user exist' });
         }
         ;
-        const created = yield (0, users_queries_1.createNewUser)(firstName, lastName, email, password, gender);
-        console.log(created, 'createdddddd');
-        if (created === true) {
+        const created = yield (0, users_queries_1.createNewUser)(firstName, lastName, email, phoneNumber, password, gender);
+        if (created.affectedRows === 1) {
             req.session.user = {
                 email: email,
                 type: 'normal',
+                id: created.insertId
             };
             return res.json({ message: 'account created successfully' });
         }
@@ -54,6 +59,7 @@ const createAccountHandler = (req, res) => __awaiter(void 0, void 0, void 0, fun
         throw 'unable to create new user';
     }
     catch (err) {
+        console.error('error in sign up api');
         res.status(500).json({ message: 'An error occured trying to create acount' });
     }
     ;

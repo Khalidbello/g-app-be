@@ -10,15 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeDOrder = exports.getDOrders = exports.createDOrder = void 0;
-const order_queries_1 = require("../services/order-queries");
+const order_queries_1 = require("../../services/users/order-queries");
 // handler for defined ordr creation
 const createDOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const email = (_a = req.session.user) === null || _a === void 0 ? void 0 : _a.email;
+    // @ts-ignore
+    const userId = (_a = req.session.user) === null || _a === void 0 ? void 0 : _a.id;
     const { gurasa, suya, name } = req.body;
     const date = new Date();
     try {
-        const result = yield (0, order_queries_1.saveDOrder)(gurasa, suya, name, email, date);
+        const result = yield (0, order_queries_1.saveDOrder)(gurasa, suya, name, userId, date);
         if (result === true)
             return res.json({ message: 'defined order created successfully' });
         throw 'error';
@@ -32,12 +33,12 @@ exports.createDOrder = createDOrder;
 // handler to handle getting defined orders
 const getDOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
-    const email = (_c = req.session.user) === null || _c === void 0 ? void 0 : _c.email;
+    // @ts-ignore
+    const userId = (_c = req.session.user) === null || _c === void 0 ? void 0 : _c.id;
     try {
         const count = parseInt(req.params.count);
         const limit = parseInt(req.params.limit);
-        //@ts-ignore
-        const result = yield (0, order_queries_1.retrieveDOrder)(count, limit, email);
+        const result = yield (0, order_queries_1.retrieveDOrder)(count, limit, userId);
         console.log(result, 'in getDordersss');
         return res.json({ data: result });
     }
@@ -52,9 +53,10 @@ exports.getDOrders = getDOrders;
 const removeDOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _d;
     try {
-        const email = (_d = req.session.user) === null || _d === void 0 ? void 0 : _d.email;
+        // @ts-ignore
+        const userId = (_d = req.session.user) === null || _d === void 0 ? void 0 : _d.id;
         const id = parseInt(req.params.id);
-        const response = yield (0, order_queries_1.deleteDOrder)(id, email);
+        const response = yield (0, order_queries_1.deleteDOrder)(id, userId);
         if (response === true)
             return res.json({ message: `defined order with id ${id} deleted succesfully` });
     }

@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOrders = exports.getOrderById = exports.initiateNewOrder = void 0;
-const v_acc_queries_1 = require("./../services/v-acc-queries");
-const order_queries_1 = require("./../services/order-queries");
+const v_acc_queries_1 = require("../../services/v-acc-queries");
+const order_queries_1 = require("../../services/users/order-queries");
 const gurasaP = 200;
 const suyaP = 100;
 const initiateNewOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

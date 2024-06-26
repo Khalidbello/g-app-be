@@ -2,8 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const virtual_account_1 = require("./../handlers/virtual-account");
-const defined_orders_1 = require("./../handlers/defined-orders");
-const orders_1 = require("./../handlers/orders");
+const defined_orders_1 = require("../handlers/users/defined-orders");
+const orders_1 = require("../handlers/users/orders");
+const email_verification_1 = require("../handlers/users/email-verification");
+const profile_1 = require("../handlers/users/profile");
 const router = (0, express_1.Router)();
 router.use((req, res, next) => {
     var _a, _b, _c, _d;
@@ -35,5 +37,15 @@ router.get('/defined-orders/:count/:limit', (req, res) => (0, defined_orders_1.g
 router.post('/create-order', (req, res) => (0, orders_1.initiateNewOrder)(req, res));
 router.get('/get-order-by-id/:id', (req, res) => (0, orders_1.getOrderById)(req, res));
 router.get('/orders/:count/:limit', (req, res) => (0, orders_1.getOrders)(req, res));
+//========================================================================================================
+// route related to user profile
+//router.post('/edit-dp', (req: Request, res: Response) => userDpUpload(req, res));
+router.get('/profile', (req, res) => (0, profile_1.getUserProfileData)(req, res));
+router.get('/check-email-verify', (req, res) => (0, email_verification_1.getCheckEmailVerify)(req, res));
+router.post('/confirm-email-otp', (req, res) => (0, email_verification_1.confirmEmailOtp)(req, res));
+router.post('/send-email-confirm-otp', (req, res) => (0, email_verification_1.generateConfirmEmailOtp)(req, res));
+router.post('/change-password', (req, res) => (0, profile_1.handleChangePassword)(req, res));
+router.post('/change-names', (req, res) => (0, profile_1.handleChangeNames)(req, res));
+// router.get('/user-dp', (req: Request, res: Response) => getUserDp(req, res));
 exports.default = router;
 //# sourceMappingURL=users.js.map

@@ -16,6 +16,15 @@ const app = express();
 const port = process.env.PORT || 8000;
 
 
+
+// environment configurations
+if (process.env.NODE_ENV === 'development') {
+    process.env.FLW_PB_KEY = process.env.FLW_TEST_PB_KEY;
+    process.env.FLW_SCRT_KEY = process.env.FLW_TEST_SCRT_KEY;
+    process.env.FLW_H = process.env.FLW_H_TEST;
+}
+
+
 //locking in middlewares
 const corsOptions = {
     origin: 'http://localhost:3000', // Replace with your allowed origin

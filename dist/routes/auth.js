@@ -8,18 +8,17 @@ router.post('/login', (req, res) => {
         (0, auth_1.logInHandler)(req, res);
     }
     catch (err) {
-        console.log('an error occured in login');
+        console.error('an error occured in login');
         res.status(500).json({ message: err });
     }
     ;
 });
 router.post('/create-acount', (req, res) => {
     try {
-        console.log('in create account..........');
         (0, auth_1.createAccountHandler)(req, res);
     }
     catch (err) {
-        console.log('error in create account', err);
+        console.error('error in create account', err);
         res.status(500).json({ message: err });
     }
 });

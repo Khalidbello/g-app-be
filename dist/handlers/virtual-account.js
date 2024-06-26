@@ -12,7 +12,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createVAcc = exports.getVAccDetails = void 0;
 const v_acc_queries_1 = require("./../services/v-acc-queries");
-const users_queries_1 = require("../services/users-queries");
+const users_queries_1 = require("../services/users/users-queries");
 const getVAccDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const email = (_a = req.session.user) === null || _a === void 0 ? void 0 : _a.email;
@@ -42,7 +42,7 @@ const createVAcc = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         // get user first name and last name
         const user = yield (0, users_queries_1.checkUserExist)(email);
-        if (user.length < 1)
+        if (!user)
             return res.status(404).json({ message: 'user details not found' });
         const flw = new Flutterwave(process.env.FLWPTK, process.env.FLWSTK);
         const payload = {

@@ -21,6 +21,7 @@ const logInHandler = async (req: Request, res: Response) => {
         };
         res.status(404).json({ message: 'user with cridentials not found' });
     } catch (err) {
+        console.error('error in login api', err);
         res.status(500).json({ message: err });
     };
 };
@@ -29,8 +30,10 @@ const logInHandler = async (req: Request, res: Response) => {
 
 // function to handle creating of new accont 
 const createAccountHandler = async (req: Request, res: Response) => {
-    const { firstName, lastName, email, password, gender } = req.body;
+    const { firstName, lastName, email, phoneNumber, password, gender } = req.body;
 
+    if (!firstName || !lastName || !email || !phoneNumber || !password || !gender) return res.status(401).json({ message: 'incomplete data sent to server for processing' });
+    
     try {
         const response = await checkUserExist(email);
 
@@ -38,7 +41,7 @@ const createAccountHandler = async (req: Request, res: Response) => {
             return res.status(409).json({ message: 'user exist' });
         };
 
-        const created = await createNewUser(firstName, lastName, email, password, gender);
+        const created = await createNewUser(firstName, lastName, email, phoneNumber, password, gender);
 
         if (created.affectedRows === 1) {
             (req.session as CustomSessionData).user = {
@@ -51,6 +54,7 @@ const createAccountHandler = async (req: Request, res: Response) => {
 
         throw 'unable to create new user';
     } catch (err) {
+        console.error('error in sign up api');
         res.status(500).json({ message: 'An error occured trying to create acount' });
     };
 };

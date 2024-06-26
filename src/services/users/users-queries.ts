@@ -21,11 +21,11 @@ const checkUserExist = async (email: string | undefined): Promise<checkUserExist
 
 
 // function to create new user
-const createNewUser = async (firstName: string, lastName: string, email: string, password: string, gender: 'male' | 'female',): Promise<any> => {
+const createNewUser = async (firstName: string, lastName: string, email: string, phoneNumber: string, password: string, gender: 'male' | 'female',): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
-        const query = 'INSERT INTO users (first_name, last_name, email, password, gender) VALUES (?, ?, ?, ?, ?)';
+        const query = 'INSERT INTO users (first_name, last_name, email, phone_number, password, gender) VALUES (?, ?, ?, ?, ?, ?)';
 
-        pool.query(query, [firstName, lastName, email, password, gender], (err, result) => {
+        pool.query(query, [firstName, lastName, email, phoneNumber, password, gender], (err, result) => {
             if (err) {
                 console.log('an eror occured in create User', err);
                 reject(err);
