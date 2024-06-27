@@ -60,10 +60,6 @@ router.get('/get-order-by-id/:id', (req: Request, res: Response) => getOrderById
 router.get('/orders/:count/:limit', (req: Request, res: Response) => getOrders(req, res));
 
 
-//====================================================================================
-// one tiem account router
-router.get('/transfer-account/:gurasaNum/:suyaNum', (req: Request, res: Response) => generateOneTimeAcc(req, res));
-
 
 //========================================================================================================
 // route related to user profile

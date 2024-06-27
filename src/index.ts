@@ -1,3 +1,4 @@
+//ngrok http --domain=weekly-settled-falcon.ngrok-free.app 5000
 
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -6,6 +7,7 @@ import express, { Request, Response, NextFunction, } from 'express';
 import auth from './routes/auth';
 import admin from './routes/admin';
 import users from './routes/users';
+import paymentGateWay from './routes/gateway'
 import cors from 'cors';
 import session from 'express-session';
 import { initiateConnection } from './modules/connectdb';
@@ -56,7 +58,7 @@ app.use(express.static('public'));
 app.use('/auth', auth);
 app.use('/admin', admin);
 app.use('/users', users);
-
+app.use('/gateway', paymentGateWay);
 
 // Define a route handler for the root path
 app.get('/', (req: Request, res: Response) => {

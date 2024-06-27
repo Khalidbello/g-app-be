@@ -112,7 +112,7 @@ const getPlacedOrders = (userId: number, limit: number, pagin: number): Promise<
 
 const queryOrderById = (userId: number, id: number): Promise<{ [keys: string]: string }> => {
     return new Promise<{ [keys: string]: string }>((resolve, reject) => {
-        const query = 'SELECT status, order_id, gurasa, suya, price, created_date, id, payment_date, bagged_date, deliver_date FROM orders WHERE userId = ? AND id = ?';
+        const query = 'SELECT * FROM orders WHERE user_id = ? AND id = ?';
 
         pool.query(query, [userId, id], (err, result) => {
             if (err) {

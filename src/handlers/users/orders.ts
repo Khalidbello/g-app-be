@@ -63,7 +63,7 @@ const getOrderById = async (req: Request, res: Response) => {
 const getOrders = async (req: Request, res: Response) => {
     try {
         // @ts-ignore
-        const userId: number = (req.session as CustomSessionData).user?.email;
+        const userId: number = (req.session as CustomSessionData).user?.id;
         const limit: number = parseInt(req.params.limit);
         const count: number = parseInt(req.params.count);
 
