@@ -4,6 +4,7 @@ import { queryUserProfile } from "../services/users/profile-queries";
 import generateRandomAlphanumericCode from "../modules/generate-random-string";
 import { addNewOrder } from "../services/users/order-queries";
 import { updateOrderPaid } from "../services/users/order-queries-2";
+import { addNewNotification } from "../services/users/notifications-queries";
 const Flutterwave = require('flutterwave-node-v3');
 const fs = require('fs');
 
@@ -46,8 +47,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
                 response.meta.authorization.transfer_account, response.meta.authorization.transfer_bank, 'Futterwave/eGurasa'
             );
 
-            console.log('new order', newOrder)
-            return res.json({
+            res.json({
                 accountName: 'eGurasa FLw',
                 accountNumber: response.meta.authorization.transfer_account,
                 bankName: response.meta.authorization.transfer_bank,
@@ -55,6 +55,12 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
                 id: newOrder.insertId,
                 orderId: orderId,
             });
+
+            // add new ordr notification
+            return addNewNotification(
+                userId, 'New Order Placed', `Your order for ${gurasaNum} gurasa and ${suyaNum} suya has been placed successfully.`, 'info',
+                false, `/order?order_id=${orderId}&id=${newOrder.insertId}`
+            );
         };
         throw 'error in creating virtual acount'
     } catch (err) {

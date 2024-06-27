@@ -6,6 +6,7 @@ import { initiateNewOrder, getOrderById, getOrders } from '../handlers/users/ord
 import { confirmEmailOtp, generateConfirmEmailOtp, getCheckEmailVerify } from '../handlers/users/email-verification';
 import { getUserProfileData, handleChangeNames, handleChangePassword } from '../handlers/users/profile';
 import { generateOneTimeAcc } from '../handlers/gateway';
+import { checkUnViewedNotiication, getNotifications, setNotToViewed } from '../handlers/users/notification';
 
 
 const router = Router();
@@ -76,6 +77,15 @@ router.post('/send-email-confirm-otp', (req: Request, res: Response) => generate
 router.post('/change-password', (req: Request, res: Response) => handleChangePassword(req, res));
 
 router.post('/change-names', (req: Request, res: Response) => handleChangeNames(req, res));
+
+
+// routes related to notification
+
+router.get('/unviewed-notification', (req: Request, res: Response) => checkUnViewedNotiication(req, res));
+
+router.get('/notifications/:limit/:pagin', (req: Request, res: Response) => getNotifications(req, res));
+
+router.get('/update-notification/:id', (req: Request, res: Response) => setNotToViewed(req, res));
 
 // router.get('/user-dp', (req: Request, res: Response) => getUserDp(req, res));
 
