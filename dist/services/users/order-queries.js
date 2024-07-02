@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queryOrderById = exports.getPlacedOrders = exports.addNewOrder = exports.deleteDOrder = exports.retrieveDOrder = exports.saveDOrder = void 0;
+exports.addNewOrder = exports.queryOrderById = exports.getPlacedOrders = exports.addNewOrderForVAcc = exports.deleteDOrder = exports.retrieveDOrder = exports.saveDOrder = void 0;
 const connectdb_1 = __importDefault(require("../../modules/connectdb"));
 // function to save new defined order
 const saveDOrder = (gurasa, suya, name, userId, date) => {
@@ -58,8 +58,26 @@ const deleteDOrder = (id, userId) => {
     });
 };
 exports.deleteDOrder = deleteDOrder;
+// add new order for one time account query
+const addNewOrder = (userId, status, gurasa, suya, price, created_date, order_id, payment_account, payment_bank, payment_name) => {
+    return new Promise((resolve, reject) => {
+        const query = 'INSERT INTO orders (user_id, status, gurasa, suya, price, created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        connectdb_1.default.query(query, [userId, status, gurasa, suya, price, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
+            if (err) {
+                console.error('an error ocured fetching defined order', err);
+                reject(err);
+            }
+            else {
+                console.log(result);
+                resolve(result);
+            }
+            ;
+        });
+    });
+};
+exports.addNewOrder = addNewOrder;
 // query to add a new order to the database
-const addNewOrder = (user, status, gurasa, suya, price, created_date, payment_date, order_id) => {
+const addNewOrderForVAcc = (user, status, gurasa, suya, price, created_date, payment_date, order_id) => {
     return new Promise((resolve, reject) => {
         const query = 'INSERT INTO orders (user, status, gurasa, suya, price, created_date, payment_date, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         connectdb_1.default.query(query, [user, status, gurasa, suya, price, created_date, payment_date, order_id], (err, result) => {
@@ -74,12 +92,12 @@ const addNewOrder = (user, status, gurasa, suya, price, created_date, payment_da
         });
     });
 };
-exports.addNewOrder = addNewOrder;
+exports.addNewOrderForVAcc = addNewOrderForVAcc;
 // query to fetch user orders 
-const getPlacedOrders = (email, limit, count) => {
+const getPlacedOrders = (userId, limit, pagin) => {
     return new Promise((resolve, reject) => {
-        const query = 'SELECT  status, gurasa, suya, price, created_date, order_id, id FROM orders WHERE user = ?  ORDER BY created_date DESC LIMIT ? OFFSET ?';
-        connectdb_1.default.query(query, [email, limit, count * limit], (err, result) => {
+        const query = 'SELECT  status, gurasa, suya, price, created_date, order_id, id FROM orders WHERE user_id = ?  ORDER BY created_date DESC LIMIT ? OFFSET ?';
+        connectdb_1.default.query(query, [userId, limit, pagin], (err, result) => {
             if (err) {
                 console.log('an error ocured fetching defined order', err);
                 reject(err);
@@ -88,14 +106,15 @@ const getPlacedOrders = (email, limit, count) => {
                 console.log(result);
                 resolve(result);
             }
+            ;
         });
     });
 };
 exports.getPlacedOrders = getPlacedOrders;
-const queryOrderById = (email, id) => {
+const queryOrderById = (userId, id) => {
     return new Promise((resolve, reject) => {
-        const query = 'SELECT status, order_id, gurasa, suya, price, created_date, id, payment_date, bagged_date, deliver_date FROM orders WHERE user = ? AND id = ?';
-        connectdb_1.default.query(query, [email, id], (err, result) => {
+        const query = 'SELECT * FROM orders WHERE user_id = ? AND id = ?';
+        connectdb_1.default.query(query, [userId, id], (err, result) => {
             if (err) {
                 console.log('an error ocured fetching defined order', err);
                 reject(err);

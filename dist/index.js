@@ -1,4 +1,5 @@
 "use strict";
+//ngrok http --domain=weekly-settled-falcon.ngrok-free.app 5000
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -32,12 +33,19 @@ const express_1 = __importDefault(require("express"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const admin_1 = __importDefault(require("./routes/admin"));
 const users_1 = __importDefault(require("./routes/users"));
+const gateway_1 = __importDefault(require("./routes/gateway"));
 const cors_1 = __importDefault(require("cors"));
 const express_session_1 = __importDefault(require("express-session"));
 const connectdb_1 = require("./modules/connectdb");
 // Create an Express application
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8000;
+// environment configurations
+if (process.env.NODE_ENV === 'development') {
+    process.env.FLW_PB_KEY = process.env.FLW_TEST_PB_KEY;
+    process.env.FLW_SCRT_KEY = process.env.FLW_TEST_SCRT_KEY;
+    process.env.FLW_H = process.env.FLW_H_TEST;
+}
 //locking in middlewares
 const corsOptions = {
     origin: 'http://localhost:3000', // Replace with your allowed origin
@@ -63,6 +71,7 @@ app.use(express_1.default.static('public'));
 app.use('/auth', auth_1.default);
 app.use('/admin', admin_1.default);
 app.use('/users', users_1.default);
+app.use('/gateway', gateway_1.default);
 // Define a route handler for the root path
 app.get('/', (req, res) => {
     res.send('Hello World!');

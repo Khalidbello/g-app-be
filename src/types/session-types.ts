@@ -4,7 +4,7 @@ import { SessionData } from "express-session";
 interface CustomSessionData extends SessionData {
     user?: {
         email: string;
-        type: 'normal' | 'admin' | 'super';
+        type: 'normal' | 'admin' | 'super' | 'staff';
         id: number;
     }; // Define the type of the user object
 }

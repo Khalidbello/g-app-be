@@ -6,6 +6,7 @@ const defined_orders_1 = require("../handlers/users/defined-orders");
 const orders_1 = require("../handlers/users/orders");
 const email_verification_1 = require("../handlers/users/email-verification");
 const profile_1 = require("../handlers/users/profile");
+const notification_1 = require("../handlers/users/notification");
 const router = (0, express_1.Router)();
 router.use((req, res, next) => {
     var _a, _b, _c, _d;
@@ -46,6 +47,10 @@ router.post('/confirm-email-otp', (req, res) => (0, email_verification_1.confirm
 router.post('/send-email-confirm-otp', (req, res) => (0, email_verification_1.generateConfirmEmailOtp)(req, res));
 router.post('/change-password', (req, res) => (0, profile_1.handleChangePassword)(req, res));
 router.post('/change-names', (req, res) => (0, profile_1.handleChangeNames)(req, res));
+// routes related to notification
+router.get('/unviewed-notification', (req, res) => (0, notification_1.checkUnViewedNotiication)(req, res));
+router.get('/notifications/:limit/:pagin', (req, res) => (0, notification_1.getNotifications)(req, res));
+router.get('/update-notification/:id', (req, res) => (0, notification_1.setNotToViewed)(req, res));
 // router.get('/user-dp', (req: Request, res: Response) => getUserDp(req, res));
 exports.default = router;
 //# sourceMappingURL=users.js.map

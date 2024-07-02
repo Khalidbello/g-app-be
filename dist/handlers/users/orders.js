@@ -28,7 +28,7 @@ const initiateNewOrder = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (!suya && !gurasa)
             return res.status(401).json({ message: 'missig parameters' });
         if (!(result === null || result === void 0 ? void 0 : result.account_number))
-            return res.status(403).json({ message: 'order cannot be placed unless a user has a virtual account' });
+            return res.status(404).json({ message: 'order cannot be placed unless a user has a virtual account' });
         if (result.balance < price)
             return res.status(402).json({ message: 'user have to fund account', toFund: price - result.balance });
         const newBalance = result.balance - price;
@@ -41,7 +41,7 @@ const initiateNewOrder = (req, res) => __awaiter(void 0, void 0, void 0, functio
         // add order to database
         const order_id = 'NVDSVVNEUN1234N5669'; // call functio to create new ordr id
         // @ts-ignore
-        const response = yield (0, order_queries_1.addNewOrder)(email, 'paid', gurasa, suya, price, created_date, payment_date, order_id);
+        const response = yield (0, order_queries_1.addNewOrderForVAcc)(email, 'paid', gurasa, suya, price, created_date, payment_date, order_id);
         //@ts-ignore
         if (response.affectedRows > 0)
             return res.json({ id: response.insertId });
@@ -56,28 +56,32 @@ exports.initiateNewOrder = initiateNewOrder;
 const getOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     try {
-        const email = (_b = req.session.user) === null || _b === void 0 ? void 0 : _b.email;
+        // @ts-ignore
+        const userId = (_b = req.session.user) === null || _b === void 0 ? void 0 : _b.id;
         const id = parseInt(req.params.id);
-        const order = yield (0, order_queries_1.queryOrderById)(email, id);
+        const order = yield (0, order_queries_1.queryOrderById)(userId, id);
         res.json({ data: order });
     }
     catch (error) {
         res.status(500).json({ message: error });
     }
+    ;
 });
 exports.getOrderById = getOrderById;
 const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _c;
     try {
-        const email = (_c = req.session.user) === null || _c === void 0 ? void 0 : _c.email;
+        // @ts-ignore
+        const userId = (_c = req.session.user) === null || _c === void 0 ? void 0 : _c.id;
         const limit = parseInt(req.params.limit);
         const count = parseInt(req.params.count);
-        const orders = yield (0, order_queries_1.getPlacedOrders)(email, limit, count);
+        const orders = yield (0, order_queries_1.getPlacedOrders)(userId, limit, count);
         res.json({ data: orders, message: 'order fetched succesfully' });
     }
     catch (error) {
         res.status(500).json({ message: error });
     }
+    ;
 });
 exports.getOrders = getOrders;
 //# sourceMappingURL=orders.js.map

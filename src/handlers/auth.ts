@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { checkUserExist, createNewUser } from '../services/users/users-queries';
 import { CustomSessionData } from './../types/session-types';
+import { queryStaff } from '../services/staffs/auth-queries';
 
 
 // function to handle user login
@@ -27,13 +28,36 @@ const logInHandler = async (req: Request, res: Response) => {
 };
 
 
+// function to handle log in
+const handleStaffLogin = async (req: Request, res: Response) => {
+    try {
+        const { email, password, vendorId } = req.body;
+
+        const staff = await queryStaff(email, vendorId);
+
+        console.log('staffff', staff);
+        if (staff && staff.password === password) {
+            (req.session as CustomSessionData).user = {
+                email: email,
+                type: 'staff',
+                id: staff.id
+            };
+            return res.status(200).json({ message: 'logged in succesfully' });
+        };
+        res.status(404).json({ message: 'user with cridentials not found' });
+    } catch (err) {
+        console.error('error occurde in staff login', err);
+        res.status(500).json({ message: err });
+    };
+};
+
 
 // function to handle creating of new accont 
 const createAccountHandler = async (req: Request, res: Response) => {
     const { firstName, lastName, email, phoneNumber, password, gender } = req.body;
 
     if (!firstName || !lastName || !email || !phoneNumber || !password || !gender) return res.status(401).json({ message: 'incomplete data sent to server for processing' });
-    
+
     try {
         const response = await checkUserExist(email);
 
@@ -59,4 +83,8 @@ const createAccountHandler = async (req: Request, res: Response) => {
     };
 };
 
-export { logInHandler, createAccountHandler };
+export {
+    logInHandler,
+    createAccountHandler,
+    handleStaffLogin
+};
