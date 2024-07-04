@@ -33,7 +33,7 @@ const getDOrders = async (req: Request, res: Response) => {
         console.log(result, 'in getDordersss');
         return res.json({ data: result });
     } catch (err) {
-        console.error
+        console.error('erro in get defined orders', err)
         res.status(500).json({ message: 'Something went wrong' });
     };
 };

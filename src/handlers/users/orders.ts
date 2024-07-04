@@ -3,27 +3,25 @@ import { CustomSessionData } from '../../types/session-types';
 import { getAcc, updateBalance } from "../../services/v-acc-queries";
 import { addNewOrderForVAcc, getPlacedOrders, queryOrderById } from '../../services/users/order-queries';
 
-const gurasaP = 200;
-const suyaP = 100;
 
 const initiateNewOrder = async (req: Request, res: Response) => {
     try {
         const email = (req.session as CustomSessionData).user?.email;
-        console.log(req.body, 'iitiate order req body');
-        const suya = parseInt(req.body.suya);
-        const gurasa = parseInt(req.body.gurasa);
-        const price = suya * suyaP + gurasa * gurasaP;
+        const orders = req.body
+
+        if (orders) return res.status(401).json({ message: 'missig parameters' });
+
+        // query all orders from data base to check if products are valid securit reasons
+
         const created_date: Date = new Date();
         const result = await getAcc(email);
         let payment_date: Date;
 
-        if (!suya && !gurasa) return res.status(401).json({ message: 'missig parameters' });
 
         if (!result?.account_number) return res.status(404).json({ message: 'order cannot be placed unless a user has a virtual account' });
 
-        if (result.balance < price) return res.status(402).json({ message: 'user have to fund account', toFund: price - result.balance });
 
-        const newBalance = result.balance - price;
+        const newBalance = result.balance;
 
         // @ts-ignore
         const balanceUpdated: boolean = await updateBalance(newBalance, email);

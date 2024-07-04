@@ -7,6 +7,7 @@ import { confirmEmailOtp, generateConfirmEmailOtp, getCheckEmailVerify } from '.
 import { getUserProfileData, handleChangeNames, handleChangePassword } from '../handlers/users/profile';
 import { generateOneTimeAcc } from '../handlers/gateway';
 import { checkUnViewedNotiication, getNotifications, setNotToViewed } from '../handlers/users/notification';
+import { getProducts, getVendors } from '../handlers/users/user-vendors';
 
 
 const router = Router();
@@ -49,7 +50,8 @@ router.delete('/delete-d-order/:id', (req: Request, res: Response) => removeDOrd
 // rote to get defined orders
 router.get('/defined-orders/:count/:limit', (req: Request, res: Response) => getDOrders(req, res));
 
-
+// routes related to vendors
+router.get('/vendors/:pagin/:limit', (req: Request, res: Response) => getVendors(req, res))
 
 //=========================================================================================================
 // route related to orders
@@ -59,6 +61,12 @@ router.post('/create-order', (req: Request, res: Response) => initiateNewOrder(r
 router.get('/get-order-by-id/:id', (req: Request, res: Response) => getOrderById(req, res));
 
 router.get('/orders/:count/:limit', (req: Request, res: Response) => getOrders(req, res));
+
+
+
+//=========================================================================================================
+// vendor user related routes
+router.get('/products/:vendorId/:pagin/:limit', (req: Request, res: Response) => getProducts(req, res));
 
 
 
