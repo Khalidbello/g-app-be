@@ -25,7 +25,7 @@ const initiateNewOrder = async (req: Request, res: Response) => {
         if (!acc?.account_number) return res.status(404).json({ message: 'order cannot be placed unless a user has a virtual account' });
 
         // query all orders from data base to check if products are valid securit reasons to get all the actual price
-        const productsArray: productsType[] = [];
+        let productsArray: productsType[] = [];
         const length = orders.length;
 
         for (let i = 0; i < length; i++) {
@@ -33,7 +33,7 @@ const initiateNewOrder = async (req: Request, res: Response) => {
             productsArray[i] = queryUserVenorProuctsById(orders[i].productId, orders[i].vendorId)
         };
 
-        await Promise.all(productsArray);
+        productsArray = await Promise.all(productsArray);
 
         for (let i = 0; i < length; i++) {
             if (!productsArray[i]) return res.status(401).json({ message: 'missig parameters' });
@@ -42,23 +42,25 @@ const initiateNewOrder = async (req: Request, res: Response) => {
         const totalPrice = calcTotalPrice(productsArray, orders);
         const newBalance = acc.balance - totalPrice;
 
-        if (!newBalance || (newBalance < 1)) return res.json({
+        if (!newBalance || (newBalance < 1)) return res.status(402).json({
             toFund: totalPrice - acc.balance,
             accountName: acc.account_name,
             accountNumber: acc.account_number,
             bankName: acc.account_name
         });
 
-        const balanceUpdated: boolean = await updateBalance(newBalance, email);
-        payment_date = new Date(); console.log(payment_date, 'paymnt date...........');
+        const balanceUpdated = await updateBalance(newBalance, email);
+        payment_date = new Date();
 
-        if (balanceUpdated !== true) throw 'error updating balance';
+        if (!balanceUpdated) throw 'error updating balance';
 
         // add order to database
         // @ts-ignore
         const orderId: string = generateRandomAlphanumericCode(15, false) // call functio to create new ordr id
-        // @ts-ignore
-        const addedOrder = await addNewOrderForVAcc(email, 'paid', orders, created_date, payment_date, order_id);
+        const ordersJson = JSON.stringify(orders);
+        const addedOrder = await addNewOrderForVAcc(
+            userId, productsArray[0].vendor_id, 'paid', ordersJson, created_date, payment_date, orderId, acc.account_name, acc.account_number, acc.bank_name
+        );
 
         // add new ordr notification
         const vendor = await queryVendorById(productsArray[0].vendor_id)
@@ -73,6 +75,7 @@ const initiateNewOrder = async (req: Request, res: Response) => {
 
         throw 'error creating order please report issue';
     } catch (error) {
+        console.error('error in create order', error);
         res.status(500).json({ message: error });
     };
 };  // end of initiateNewOrder

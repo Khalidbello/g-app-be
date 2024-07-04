@@ -58,12 +58,12 @@ const deleteDOrder = (id: number, userId: number): Promise<boolean> => {
 
 // add new order for one time account query
 const addNewOrder =
-    (userId: number, status: 'placed' | 'paid' | 'bagged' | 'delivered', orders: productsType[], created_date: Date, order_id: string,
+    (userId: number, status: 'placed' | 'paid' | 'bagged' | 'delivered', orders: string, created_date: Date, order_id: string,
         payment_account: string, payment_bank: string, payment_name: string): Promise<{ [keys: string]: string }> => {
         return new Promise<{ [keys: string]: string }>((resolve, reject) => {
-            const query = 'INSERT INTO orders (user_id, status, order created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            const query = 'INSERT INTO orders (user_id, status, \`order\`, created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-            pool.query(query, [userId, status, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
+            pool.query(query, [userId, status, orders, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
                 if (err) {
                     console.error('an error ocured fetching defined order', err)
                     reject(err);
@@ -76,32 +76,34 @@ const addNewOrder =
     };
 
 
-// query to add a new order to the database
-const addNewOrderForVAcc = (user: string, status: string, gurasa: number, suya: number, price: number, created_date: Date, payment_date: Date, order_id: string): Promise<{ [keys: string]: string }> => {
+const addNewOrderForVAcc = (
+    userId: number, vendorId: number, status: string, order: string, created_date: Date, payment_date: Date, order_id: string, accountName: string,
+    accountNumber: string, bankName: string
+): Promise<{ [keys: string]: string }> => {
     return new Promise<{ [keys: string]: string }>((resolve, reject) => {
-        const query = 'INSERT INTO orders (user, status, gurasa, suya, price, created_date, payment_date, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        const query = 'INSERT INTO orders (user_id, vendor_id, status, \`order\`, created_date, payment_date, order_id, payment_bank, payment_name, payment_account) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-        pool.query(query, [user, status, gurasa, suya, price, created_date, payment_date, order_id], (err, result) => {
+        pool.query(query, [userId, vendorId, status, order, created_date, payment_date, order_id, bankName, accountName, accountNumber], (err, result) => {
             if (err) {
-                console.log('an error ocured fetching defined order', err)
+                console.log('An error occurred while adding the order', err);
                 reject(err);
             } else {
                 console.log(result);
                 resolve(result);
             }
-        })
-    })
-}
+        });
+    });
+};
 
 
 // query to fetch user orders 
 const getPlacedOrders = (userId: number, limit: number, pagin: number): Promise<[]> => {
     return new Promise<[]>((resolve, reject) => {
-        const query = 'SELECT  status, gurasa, suya, price, created_date, order_id, id FROM orders WHERE user_id = ?  ORDER BY created_date DESC LIMIT ? OFFSET ?';
+        const query = 'SELECT  status, \`order\`, created_date, order_id, id FROM orders WHERE user_id = ?  ORDER BY created_date DESC LIMIT ? OFFSET ?';
 
         pool.query(query, [userId, limit, pagin], (err, result) => {
             if (err) {
-                console.log('an error ocured fetching defined order', err)
+                console.log('an error ocured fetching recent orders order', err)
                 reject(err);
             } else {
                 console.log(result);
@@ -121,7 +123,7 @@ const queryOrderById = (userId: number, id: number): Promise<{ [keys: string]: s
                 reject(err);
             } else {
                 console.log(result);
-                resolve(result);
+                resolve(result[0]);
             }
         })
     })

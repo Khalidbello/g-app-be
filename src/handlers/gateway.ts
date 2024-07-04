@@ -5,7 +5,7 @@ import generateRandomAlphanumericCode from "../modules/generate-random-string";
 import { addNewOrder } from "../services/users/order-queries";
 import { updateOrderPaid } from "../services/users/order-queries-2";
 import { addNewNotification } from "../services/users/notifications-queries";
-import { productsType, queryVendorById } from "../services/users/user-vendor-queries";
+import { productsType, queryUserVenorProuctsById, queryVendorById } from "../services/users/user-vendor-queries";
 import calcTotalPrice from "../modules/calc-order-total-price";
 const Flutterwave = require('flutterwave-node-v3');
 const fs = require('fs');
@@ -27,13 +27,18 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
             productsArray[i] = queryUserVenorProuctsById(orders[i].productId, orders[i].vendorId)
         };
 
-        await Promise.all(productsArray);
+        const nProductsArray = await Promise.all(productsArray);
+
+        console.log('ordr arrry......', nProductsArray);
+
 
         for (let i = 0; i < length; i++) {
-            if (!productsArray[i]) return res.status(401).json({ message: 'missig parameters' });
+            if (!nProductsArray[i]) return res.status(401).json({ message: 'missig parameters' });
         };
 
-        const totalPrice = calcTotalPrice(productsArray, orders);
+        const totalPrice = calcTotalPrice(nProductsArray, orders);
+
+        console.log('total price', totalPrice);
         const userInfo = await queryUserProfile(userId);
         // @ts-ignoreF
         const orderId: string = generateRandomAlphanumericCode(15, false);
@@ -54,11 +59,11 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
 
         const response = await flw.Charge.bank_transfer(details); console.log('accoint detauls :', response)
         const date = new Date();
+        const orderJson = JSON.stringify(orders);
 
-        console.error('one time account response', response);
         if (response.status === 'success') {
             const newOrder = await addNewOrder(
-                userId, 'placed', orders, date, orderId,
+                userId, 'placed', orderJson, date, orderId,
                 response.meta.authorization.transfer_account, response.meta.authorization.transfer_bank, 'Futterwave/eGurasa'
             );
 

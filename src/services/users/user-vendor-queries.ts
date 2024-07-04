@@ -23,7 +23,7 @@ const queryVendors = (limit: number, pagin: number): Promise<getVendors> => {
 
 const queryVendorById = (id: number): Promise<getVendors> => {
     return new Promise<getVendors>((resolve, reject) => {
-        const query = 'SELECT * FROM vendors WHERE vendor_id =?';
+        const query = 'SELECT * FROM vendors WHERE id =?';
 
         pool.query(query, [id], (err, result) => {
             if (err) return reject(err);
@@ -60,7 +60,7 @@ const queryUserVenorProuctsById = (productId: number, vendorId: number): Promise
         pool.query(query, [productId, vendorId], (err, result) => {
             if (err) return reject(err);
 
-            resolve(result);
+            resolve(result[0]);
         })
     })
 }
