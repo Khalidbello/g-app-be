@@ -58,12 +58,12 @@ const deleteDOrder = (id: number, userId: number): Promise<boolean> => {
 
 // add new order for one time account query
 const addNewOrder =
-    (userId: number, status: 'placed' | 'paid' | 'bagged' | 'delivered', orders: string, created_date: Date, order_id: string,
+    (userId: number, vendorId: number, status: 'placed' | 'paid' | 'bagged' | 'delivered', orders: string, created_date: Date, order_id: string,
         payment_account: string, payment_bank: string, payment_name: string): Promise<{ [keys: string]: string }> => {
         return new Promise<{ [keys: string]: string }>((resolve, reject) => {
-            const query = 'INSERT INTO orders (user_id, status, \`order\`, created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            const query = 'INSERT INTO orders (user_id, vendor_id, status, \`order\`, created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-            pool.query(query, [userId, status, orders, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
+            pool.query(query, [userId,vendorId, status, orders, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
                 if (err) {
                     console.error('an error ocured fetching defined order', err)
                     reject(err);

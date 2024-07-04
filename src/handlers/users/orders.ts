@@ -63,7 +63,7 @@ const initiateNewOrder = async (req: Request, res: Response) => {
         );
 
         // add new ordr notification
-        const vendor = await queryVendorById(productsArray[0].vendor_id)
+        const vendor = await queryVendorById(productsArray[0].vendor_id);
 
         await addNewNotification(
             userId, 'New Order Placed', `Your order from ${vendor.name} has been placed successfully.`, 'info',

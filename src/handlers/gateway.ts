@@ -19,7 +19,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
         if (!orders) return res.status(401).json({ message: 'request parmters are missing' })
 
         // query all orders from data base to check if products are valid securit reasons to get all the actual price
-        const productsArray: productsType[] = [];
+        let productsArray: productsType[] = [];
         const length = orders.length;
 
         for (let i = 0; i < length; i++) {
@@ -27,16 +27,16 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
             productsArray[i] = queryUserVenorProuctsById(orders[i].productId, orders[i].vendorId)
         };
 
-        const nProductsArray = await Promise.all(productsArray);
+        productsArray = await Promise.all(productsArray);
 
-        console.log('ordr arrry......', nProductsArray);
+        console.log('ordr arrry......', productsArray);
 
 
         for (let i = 0; i < length; i++) {
-            if (!nProductsArray[i]) return res.status(401).json({ message: 'missig parameters' });
+            if (!productsArray[i]) return res.status(401).json({ message: 'missig parameters' });
         };
 
-        const totalPrice = calcTotalPrice(nProductsArray, orders);
+        const totalPrice = calcTotalPrice(productsArray, orders);
 
         console.log('total price', totalPrice);
         const userInfo = await queryUserProfile(userId);
@@ -63,7 +63,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
 
         if (response.status === 'success') {
             const newOrder = await addNewOrder(
-                userId, 'placed', orderJson, date, orderId,
+                userId, productsArray[0].vendor_id, 'placed', orderJson, date, orderId,
                 response.meta.authorization.transfer_account, response.meta.authorization.transfer_bank, 'Futterwave/eGurasa'
             );
 
@@ -76,7 +76,8 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
                 orderId: orderId,
             });
 
-            const vendor = await queryVendorById(productsArray[0].vendor_id)
+            const vendor = await queryVendorById(productsArray[0].vendor_id);
+            console.log('vnedorrrrrrrrrrrr', productsArray[0].vendor_id, vendor);
             // add new ordr notification
             return addNewNotification(
                 userId, 'New Order Placed', `Your order from ${vendor.name} has been placed successfully.`, 'info',
