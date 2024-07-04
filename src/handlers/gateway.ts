@@ -5,6 +5,8 @@ import generateRandomAlphanumericCode from "../modules/generate-random-string";
 import { addNewOrder } from "../services/users/order-queries";
 import { updateOrderPaid } from "../services/users/order-queries-2";
 import { addNewNotification } from "../services/users/notifications-queries";
+import { productsType, queryVendorById } from "../services/users/user-vendor-queries";
+import calcTotalPrice from "../modules/calc-order-total-price";
 const Flutterwave = require('flutterwave-node-v3');
 const fs = require('fs');
 
@@ -12,25 +14,38 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
     try {
         // @ts-ignore
         const userId: number = (req.session as CustomSessionData).user?.id;
-        const { gurasaNum, suyaNum } = req.params;
-        const data = fs.readFileSync('prices.json', 'utf8'); // Read file synchronously
-        const priceData = JSON.parse(data); // Parse JSON string
+        const orders = req.body.orders;
 
-        const price: number = parseInt(gurasaNum) * priceData.gurasa + parseInt(suyaNum) * priceData.suya;
-        console.error('amunt.......', price);
+        if (!orders) return res.status(401).json({ message: 'request parmters are missing' })
+
+        // query all orders from data base to check if products are valid securit reasons to get all the actual price
+        const productsArray: productsType[] = [];
+        const length = orders.length;
+
+        for (let i = 0; i < length; i++) {
+            // @ts-ignore
+            productsArray[i] = queryUserVenorProuctsById(orders[i].productId, orders[i].vendorId)
+        };
+
+        await Promise.all(productsArray);
+
+        for (let i = 0; i < length; i++) {
+            if (!productsArray[i]) return res.status(401).json({ message: 'missig parameters' });
+        };
+
+        const totalPrice = calcTotalPrice(productsArray, orders);
         const userInfo = await queryUserProfile(userId);
         // @ts-ignoreF
         const orderId: string = generateRandomAlphanumericCode(15, false);
 
         const details = {
             tx_ref: generateRandomAlphanumericCode(10, false),
-            amount: price,
+            amount: totalPrice,
             email: userInfo.email,
             fullname: userInfo.first_name + ' ' + userInfo.last_name,
             currency: 'NGN',
             meta: {
-                gurasaNum,
-                suyaNum,
+                order: orders,
                 userId: userInfo.id,
                 orderId: orderId
             },
@@ -43,7 +58,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
         console.error('one time account response', response);
         if (response.status === 'success') {
             const newOrder = await addNewOrder(
-                userId, 'placed', parseFloat(gurasaNum), parseInt(suyaNum), price, date, orderId,
+                userId, 'placed', orders, date, orderId,
                 response.meta.authorization.transfer_account, response.meta.authorization.transfer_bank, 'Futterwave/eGurasa'
             );
 
@@ -56,18 +71,20 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
                 orderId: orderId,
             });
 
+            const vendor = await queryVendorById(productsArray[0].vendor_id)
             // add new ordr notification
             return addNewNotification(
-                userId, 'New Order Placed', `Your order for ${gurasaNum} gurasa and ${suyaNum} suya has been placed successfully.`, 'info',
+                userId, 'New Order Placed', `Your order from ${vendor.name} has been placed successfully.`, 'info',
                 false, `/order?order_id=${orderId}&id=${newOrder.insertId}`
             );
         };
-        throw 'error in creating virtual acount'
+        throw 'error in creating one time account acount'
     } catch (err) {
         console.log('error in generate one time account number', err);
         res.status(500).json({ message: err });
-    }
-}
+    };
+}; // end of generateOneTimeAcc
+
 
 
 // function to responsd ti webhok event

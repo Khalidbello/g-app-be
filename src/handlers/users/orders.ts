@@ -2,47 +2,83 @@ import { Request, Response } from "express";
 import { CustomSessionData } from '../../types/session-types';
 import { getAcc, updateBalance } from "../../services/v-acc-queries";
 import { addNewOrderForVAcc, getPlacedOrders, queryOrderById } from '../../services/users/order-queries';
+import { productsType, queryUserVenorProuctsById, queryVendorById } from "../../services/users/user-vendor-queries";
+import calcTotalPrice from "../../modules/calc-order-total-price";
+import { addNewNotification } from "../../services/users/notifications-queries";
+import generateRandomAlphanumericCode from "../../modules/generate-random-string";
 
 
 const initiateNewOrder = async (req: Request, res: Response) => {
     try {
-        const email = (req.session as CustomSessionData).user?.email;
-        const orders = req.body
+        // @ts-ignore
+        const email: string = (req.session as CustomSessionData).user?.email;
+        // @ts-ignore
+        const userId: number = (req.session as CustomSessionData).user?.id;
+        const orders = req.body.orders;
 
-        if (orders) return res.status(401).json({ message: 'missig parameters' });
-
-        // query all orders from data base to check if products are valid securit reasons
+        if (!orders) return res.status(401).json({ message: 'missig parameters' });
 
         const created_date: Date = new Date();
-        const result = await getAcc(email);
+        const acc = await getAcc(email);
         let payment_date: Date;
 
+        if (!acc?.account_number) return res.status(404).json({ message: 'order cannot be placed unless a user has a virtual account' });
 
-        if (!result?.account_number) return res.status(404).json({ message: 'order cannot be placed unless a user has a virtual account' });
+        // query all orders from data base to check if products are valid securit reasons to get all the actual price
+        const productsArray: productsType[] = [];
+        const length = orders.length;
 
+        for (let i = 0; i < length; i++) {
+            // @ts-ignore
+            productsArray[i] = queryUserVenorProuctsById(orders[i].productId, orders[i].vendorId)
+        };
 
-        const newBalance = result.balance;
+        await Promise.all(productsArray);
 
-        // @ts-ignore
+        for (let i = 0; i < length; i++) {
+            if (!productsArray[i]) return res.status(401).json({ message: 'missig parameters' });
+        };
+
+        const totalPrice = calcTotalPrice(productsArray, orders);
+        const newBalance = acc.balance - totalPrice;
+
+        if (!newBalance || (newBalance < 1)) return res.json({
+            toFund: totalPrice - acc.balance,
+            accountName: acc.account_name,
+            accountNumber: acc.account_number,
+            bankName: acc.account_name
+        });
+
         const balanceUpdated: boolean = await updateBalance(newBalance, email);
         payment_date = new Date(); console.log(payment_date, 'paymnt date...........');
 
         if (balanceUpdated !== true) throw 'error updating balance';
 
         // add order to database
-        const order_id = 'NVDSVVNEUN1234N5669' // call functio to create new ordr id
         // @ts-ignore
-        const response = await addNewOrderForVAcc(email, 'paid', gurasa, suya, price, created_date, payment_date, order_id);
+        const orderId: string = generateRandomAlphanumericCode(15, false) // call functio to create new ordr id
+        // @ts-ignore
+        const addedOrder = await addNewOrderForVAcc(email, 'paid', orders, created_date, payment_date, order_id);
 
+        // add new ordr notification
+        const vendor = await queryVendorById(productsArray[0].vendor_id)
+
+        await addNewNotification(
+            userId, 'New Order Placed', `Your order from ${vendor.name} has been placed successfully.`, 'info',
+            false, `/order?order_id=${orderId}&id=${addedOrder.insertId}`
+        );
 
         //@ts-ignore
-        if (response.affectedRows > 0) return res.json({ id: response.insertId });
+        if (addedOrder.affectedRows > 0) return res.json({ id: addedOrder.insertId });
 
         throw 'error creating order please report issue';
     } catch (error) {
         res.status(500).json({ message: error });
     };
-};
+};  // end of initiateNewOrder
+
+
+
 
 const getOrderById = async (req: Request, res: Response) => {
     try {
@@ -56,7 +92,9 @@ const getOrderById = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ message: error });
     };
-};
+};  // end of getOrderById
+
+
 
 const getOrders = async (req: Request, res: Response) => {
     try {
@@ -70,7 +108,7 @@ const getOrders = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ message: error });
     };
-};
+};  // end of getOrders
 
 
 

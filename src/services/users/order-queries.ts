@@ -1,5 +1,6 @@
 import { query } from "express";
 import pool from "../../modules/connectdb";
+import { productsType } from "./user-vendor-queries";
 
 // function to save new defined order
 const saveDOrder = (gurasa: number, suya: number, name: string, userId: number, date: Date): Promise<boolean> => {
@@ -57,12 +58,12 @@ const deleteDOrder = (id: number, userId: number): Promise<boolean> => {
 
 // add new order for one time account query
 const addNewOrder =
-    (userId: number, status: 'placed' | 'paid' | 'bagged' | 'delivered', gurasa: number, suya: number, price: number, created_date: Date, order_id: string,
+    (userId: number, status: 'placed' | 'paid' | 'bagged' | 'delivered', orders: productsType[], created_date: Date, order_id: string,
         payment_account: string, payment_bank: string, payment_name: string): Promise<{ [keys: string]: string }> => {
         return new Promise<{ [keys: string]: string }>((resolve, reject) => {
-            const query = 'INSERT INTO orders (user_id, status, gurasa, suya, price, created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const query = 'INSERT INTO orders (user_id, status, order created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-            pool.query(query, [userId, status, gurasa, suya, price, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
+            pool.query(query, [userId, status, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
                 if (err) {
                     console.error('an error ocured fetching defined order', err)
                     reject(err);
