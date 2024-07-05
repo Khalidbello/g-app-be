@@ -2,11 +2,11 @@ import pool from "../../modules/connectdb";
 
 
 // function to save new defined order
-const saveDOrder = (userId: number, vendorId: number, name: string, order: string, date: Date): Promise<boolean> => {
+const saveDOrder = (userId: number, vendorId: number, vendorName: string, name: string, order: string, date: Date): Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
-        const query = 'INSERT INTO defined_orders (user_id, vendor_id, name, \`order\`, created_at) VALUES (?, ?, ?, ?, ?)';
+        const query = 'INSERT INTO defined_orders (user_id, vendor_id, vendor_name, name, \`order\`, created_at) VALUES (?, ?, ?, ?, ?)';
 
-        pool.query(query, [userId, vendorId, name, order, date], (err, result) => {
+        pool.query(query, [userId, vendorId, vendorName, name, order, date], (err, result) => {
             if (err) {
                 console.log('an error occured trying to create new defined order', err);
                 reject(err);
