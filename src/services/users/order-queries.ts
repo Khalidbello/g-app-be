@@ -4,7 +4,7 @@ import pool from "../../modules/connectdb";
 // function to save new defined order
 const saveDOrder = (userId: number, vendorId: number, vendorName: string, name: string, order: string, date: Date): Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
-        const query = 'INSERT INTO defined_orders (user_id, vendor_id, vendor_name, name, \`order\`, created_at) VALUES (?, ?, ?, ?, ?)';
+        const query = 'INSERT INTO defined_orders (user_id, vendor_id, vendor_name, name, \`order\`, created_at) VALUES (?, ?, ?, ?, ?, ?)';
 
         pool.query(query, [userId, vendorId, vendorName, name, order, date], (err, result) => {
             if (err) {

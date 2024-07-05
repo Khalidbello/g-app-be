@@ -11,7 +11,7 @@ const createDOrder = async (req: Request, res: Response) => {
     const date = new Date();
 
     try {
-        if (!order || !name || !vendorName || vendorId) return res.status(401).json({ message: 'incomplete data sent to server for processing.' });
+        if (!order || !name || !vendorName || !vendorId) return res.status(401).json({ message: 'incomplete data sent to server for processing.' });
 
         const result: boolean = await saveDOrder(userId, vendorId, vendorName, name, JSON.stringify(order), date);
 
