@@ -7,11 +7,13 @@ import { deleteDOrder, retrieveDOrder, saveDOrder } from "../../services/users/o
 const createDOrder = async (req: Request, res: Response) => {
     // @ts-ignore
     const userId: number = (req.session as CustomSessionData).user?.id;
-    const { gurasa, suya, name } = req.body;
+    const { order, name } = req.body;
     const date = new Date();
 
     try {
-        const result: boolean = await saveDOrder(gurasa, suya, name, userId, date);
+        if (!order || !name) return res.status(401).json({ message: 'incomplete data sent to server for processing.' });
+
+        const result: boolean = await saveDOrder(userId, order[0].vendorId, name, JSON.stringify(order), date);
 
         if (result === true) return res.json({ message: 'defined order created successfully' });
         throw 'error';
@@ -30,7 +32,7 @@ const getDOrders = async (req: Request, res: Response) => {
         const count: number = parseInt(req.params.count);
         const limit: number = parseInt(req.params.limit);
         const result = await retrieveDOrder(count, limit, userId);
-        console.log(result, 'in getDordersss');
+
         return res.json({ data: result });
     } catch (err) {
         console.error('erro in get defined orders', err)

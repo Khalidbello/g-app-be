@@ -12,6 +12,12 @@ import { getProducts, getVendors } from '../handlers/users/user-vendors';
 
 const router = Router();
 
+
+//=========================================================================================================
+// vendor user related routes
+router.get('/products/:vendorId/:pagin/:limit', (req: Request, res: Response) => getProducts(req, res));
+
+
 router.use((req: Request, res: Response, next: NextFunction) => {
     if (
         (req.session as CustomSessionData).user?.email && (
@@ -53,6 +59,8 @@ router.get('/defined-orders/:count/:limit', (req: Request, res: Response) => get
 // routes related to vendors
 router.get('/vendors/:pagin/:limit', (req: Request, res: Response) => getVendors(req, res))
 
+
+
 //=========================================================================================================
 // route related to orders
 
@@ -61,13 +69,6 @@ router.post('/create-order', (req: Request, res: Response) => initiateNewOrder(r
 router.get('/get-order-by-id/:id', (req: Request, res: Response) => getOrderById(req, res));
 
 router.get('/orders/:count/:limit', (req: Request, res: Response) => getOrders(req, res));
-
-
-
-//=========================================================================================================
-// vendor user related routes
-router.get('/products/:vendorId/:pagin/:limit', (req: Request, res: Response) => getProducts(req, res));
-
 
 
 //========================================================================================================

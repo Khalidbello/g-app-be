@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'development') {
 
 //locking in middlewares
 const corsOptions = {
-    origin: 'http://localhost:3000', // Replace with your allowed origin
+    origin: ['http://localhost:3000', 'https://weekly-settled-falcon.ngrok-free.app'], // Replace with your allowed origin
     credentials: true, // Enable credentials (cookies, authorization headers)
 };
 

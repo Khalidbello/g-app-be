@@ -1,13 +1,12 @@
-import { query } from "express";
 import pool from "../../modules/connectdb";
-import { productsType } from "./user-vendor-queries";
+
 
 // function to save new defined order
-const saveDOrder = (gurasa: number, suya: number, name: string, userId: number, date: Date): Promise<boolean> => {
+const saveDOrder = (userId: number, vendorId: number, name: string, order: string, date: Date): Promise<boolean> => {
     return new Promise<boolean>((resolve, reject) => {
-        const query = 'INSERT INTO defined_orders (suya, gurasa, name, created, user_id) VALUES (?, ?, ?, ?, ?)'
+        const query = 'INSERT INTO defined_orders (user_id, vendor_id, name, \`order\`, created_at) VALUES (?, ?, ?, ?, ?)';
 
-        pool.query(query, [suya, gurasa, name, date, userId], (err, result) => {
+        pool.query(query, [userId, vendorId, name, order, date], (err, result) => {
             if (err) {
                 console.log('an error occured trying to create new defined order', err);
                 reject(err);
@@ -23,7 +22,7 @@ const saveDOrder = (gurasa: number, suya: number, name: string, userId: number, 
 // function to retrieve defined order
 const retrieveDOrder = (count: number, limit: number, userId: number): Promise<[]> => {
     return new Promise<[]>((resolve, reject) => {
-        const query = 'SELECT suya, gurasa, name, id FROM defined_orders WHERE user_id = ? ORDER BY created DESC LIMIT ? OFFSET ?';
+        const query = 'SELECT * FROM defined_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
 
         pool.query(query, [userId, limit, limit * count], (err, result) => {
             if (err) {
@@ -63,7 +62,7 @@ const addNewOrder =
         return new Promise<{ [keys: string]: string }>((resolve, reject) => {
             const query = 'INSERT INTO orders (user_id, vendor_id, status, \`order\`, created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-            pool.query(query, [userId,vendorId, status, orders, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
+            pool.query(query, [userId, vendorId, status, orders, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
                 if (err) {
                     console.error('an error ocured fetching defined order', err)
                     reject(err);
