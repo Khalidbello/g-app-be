@@ -21,9 +21,7 @@ router.get('/products/:vendorId/:pagin/:limit', (req: Request, res: Response) =>
 router.use((req: Request, res: Response, next: NextFunction) => {
     if (
         (req.session as CustomSessionData).user?.email && (
-            (req.session as CustomSessionData).user?.type === 'normal' ||
-            (req.session as CustomSessionData).user?.type === 'admin' ||
-            (req.session as CustomSessionData).user?.type === 'super'
+            (req.session as CustomSessionData).user?.type === 'normal'
         )) {
         next()
     } else {

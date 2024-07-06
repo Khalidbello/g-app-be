@@ -17,7 +17,8 @@ const createDOrder = async (req: Request, res: Response) => {
 
         if (result === true) return res.json({ message: 'defined order created successfully' });
         throw 'error';
-    } catch {
+    } catch (err) {
+        console.error('error in create defined order', err);
         res.status(500).json({ message: 'Something went wrong' });
     };
 };
