@@ -59,7 +59,7 @@ const initiateNewOrder = async (req: Request, res: Response) => {
         const orderId: string = generateRandomAlphanumericCode(15, false) // call functio to create new ordr id
         const ordersJson = JSON.stringify(orders);
         const addedOrder = await addNewOrderForVAcc(
-            userId, productsArray[0].vendor_id, 'paid', ordersJson, created_date, payment_date, orderId, acc.account_name, acc.account_number, acc.bank_name
+            userId, productsArray[0].vendor_id, productsArray[0].name, 'paid', ordersJson, created_date, payment_date, orderId, acc.account_name, acc.account_number, acc.bank_name
         );
 
         // add new ordr notification

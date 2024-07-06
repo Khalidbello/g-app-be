@@ -63,7 +63,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
 
         if (response.status === 'success') {
             const newOrder = await addNewOrder(
-                userId, productsArray[0].vendor_id, 'placed', orderJson, date, orderId,
+                userId, productsArray[0].vendor_id, productsArray[0].name, 'placed', orderJson, date, orderId,
                 response.meta.authorization.transfer_account, response.meta.authorization.transfer_bank, 'Futterwave/eGurasa'
             );
 
