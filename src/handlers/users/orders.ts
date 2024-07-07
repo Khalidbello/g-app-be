@@ -14,9 +14,9 @@ const initiateNewOrder = async (req: Request, res: Response) => {
         const email: string = (req.session as CustomSessionData).user?.email;
         // @ts-ignore
         const userId: number = (req.session as CustomSessionData).user?.id;
-        const orders = req.body.orders;
+        const { orders, vendorName } = req.body;
 
-        if (!orders) return res.status(401).json({ message: 'missig parameters' });
+        if (!orders || !vendorName) return res.status(401).json({ message: 'missig parameters' });
 
         const created_date: Date = new Date();
         const acc = await getAcc(email);
@@ -59,7 +59,7 @@ const initiateNewOrder = async (req: Request, res: Response) => {
         const orderId: string = generateRandomAlphanumericCode(15, false) // call functio to create new ordr id
         const ordersJson = JSON.stringify(orders);
         const addedOrder = await addNewOrderForVAcc(
-            userId, productsArray[0].vendor_id, productsArray[0].name, 'paid', ordersJson, created_date, payment_date, orderId, acc.account_name, acc.account_number, acc.bank_name
+            userId, productsArray[0].vendor_id, vendorName, 'paid', ordersJson, created_date, payment_date, orderId, acc.account_name, acc.account_number, acc.bank_name
         );
 
         // add new ordr notification

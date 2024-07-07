@@ -45,7 +45,7 @@ const orderToBagged = async (req: Request, res: Response) => {
             delivery service would contact you any moment from now`;
 
         // @ts-expect-error
-        addNewNotification(orderData.user_id, 'Order succesfully bagged', message, 'info', false, `/order?order_id=${orderData.order_id}&id=${orderData.id}`)
+        addNewNotification(orderData.user_id, 'Order succesfully bagged', message, 'info', false, `/order?order_id=${orderData.order_id}&id=${orderData.id}`);
         res.json({ message: 'ordr bagged successfully' });
     } catch (err) {
         console.error('error in change order to bagged', err);

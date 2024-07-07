@@ -18,9 +18,9 @@ const queryPaidOrders = (vendorId: number, pagin: number, limit: number) => {
 const queryVendorOrderToBagged = (staffId: number, vendorId: number, orderKey: number) => {
     return new Promise<boolean>((resolve, reject) => {
         const date = new Date();
-        const query = 'UPDATE orders SET status = ?, bagged_by = ?, bagged_date = ? WHERE id = ? AND vendor_id = ?';
+        const query = 'UPDATE \`orders\` SET status = ?, bagged_by = ?, bagged_date = ? WHERE id = ?';
 
-        pool.query(query, ['bagged', staffId, date, orderKey, vendorId], (err, resutlt) => {
+        pool.query(query, ['bagged', staffId, date, orderKey], (err, resutlt) => {
             if (err) return reject(err);
 
             resolve(resutlt.affectedRows > 0);
