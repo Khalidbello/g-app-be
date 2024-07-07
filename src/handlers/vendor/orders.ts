@@ -98,7 +98,7 @@ const orderToDelivered = async (req: Request, res: Response) => {
 
         // send notification to user
         const orderData = await queryOrderByKey(orderKey);
-        const message = `Your order from ${vendorData.name} with orderID: ${orderData.order_id} has been successfully bagged, `;
+        const message = `Your order from ${vendorData.name} with orderID: ${orderData.order_id} has been successfully delivered`;
 
         // @ts-ignore
         addNewNotification(orderData.user_id, 'Order succesfully delivered', message, 'success', false, `/order?order_id=${orderData.order_id}&id=${orderData.id}`);
