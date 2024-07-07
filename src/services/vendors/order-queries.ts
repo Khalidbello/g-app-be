@@ -14,6 +14,20 @@ const queryPaidOrders = (vendorId: number, pagin: number, limit: number) => {
 };
 
 
+// query paid orders sorted by payment data
+const queryBaggedOrders = (vendorId: number, pagin: number, limit: number) => {
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT * FROM orders WHERE vendor_id = ?  AND status = ? ORDER BY payment_date ASC LIMIT ? OFFSET ?';
+
+        pool.query(query, [vendorId, 'bagged', limit, pagin], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result);
+        });
+    });
+};
+
+
 // query to update order status to bagged 
 const queryVendorOrderToBagged = (staffId: number, vendorId: number, orderKey: number) => {
     return new Promise<boolean>((resolve, reject) => {
@@ -28,6 +42,20 @@ const queryVendorOrderToBagged = (staffId: number, vendorId: number, orderKey: n
     });
 };
 
+
+// query to change order to dleivered
+const queryVendorOrderToDelivered = (staffId: number, vendorId: number, orderKey: number) => {
+    return new Promise<boolean>((resolve, reject) => {
+        const date = new Date();
+        const query = 'UPDATE \`orders\` SET status = ?, delivered_by = ?, deliver_date = ? WHERE id = ?';
+
+        pool.query(query, ['delivered', staffId, date, orderKey], (err, resutlt) => {
+            if (err) return reject(err);
+
+            resolve(resutlt.affectedRows > 0);
+        });
+    });
+};
 
 
 const queryOrderByKey = (id: number): Promise<{ [keys: string]: string }> => {
@@ -50,4 +78,6 @@ export {
     queryPaidOrders,
     queryVendorOrderToBagged,
     queryOrderByKey,
+    queryVendorOrderToDelivered,
+    queryBaggedOrders,
 };
