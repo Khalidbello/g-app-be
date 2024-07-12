@@ -7,6 +7,7 @@ import { updateOrderPaid } from "../services/users/order-queries-2";
 import { addNewNotification } from "../services/users/notifications-queries";
 import { productsType, queryUserVenorProuctsById, queryVendorById } from "../services/users/user-vendor-queries";
 import calcTotalPrice from "../modules/calc-order-total-price";
+import { queryOrderByLastFourAndUserId } from "../services/vendors/order-queries";
 const Flutterwave = require('flutterwave-node-v3');
 const fs = require('fs');
 
@@ -29,7 +30,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
 
         productsArray = await Promise.all(productsArray);
 
-        console.log('ordr arrry......', productsArray);
+        //console.log('ordr arrry......', productsArray);
 
 
         for (let i = 0; i < length; i++) {
@@ -40,8 +41,21 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
 
         console.log('total price', totalPrice);
         const userInfo = await queryUserProfile(userId);
-        // @ts-ignoreF
-        const orderId: string = generateRandomAlphanumericCode(15, false);
+        // @ts-ignore
+        let orderId: string = generateRandomAlphanumericCode(8, false);
+        // @ts-ignore
+        let lastFour: string = generateRandomAlphanumericCode(4, false);
+        let condition = true;
+
+        // a loop to run to ensure no user order exist with the specific last four for user
+        while (condition) {
+            const result = await queryOrderByLastFourAndUserId(lastFour, userId);
+            if (result[0]) {
+                condition = true;
+            } else {
+                condition = false;
+            };
+        };
 
         const details = {
             tx_ref: generateRandomAlphanumericCode(10, false),
@@ -52,9 +66,11 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
             meta: {
                 order: orders,
                 userId: userInfo.id,
-                orderId: orderId
+                orderId: orderId,
+                lastFour: lastFour
             },
         };
+
         const flw = new Flutterwave(process.env.FLW_PB_KEY, process.env.FLW_SCRT_KEY);
 
         const response = await flw.Charge.bank_transfer(details); console.log('accoint detauls :', response)
@@ -63,7 +79,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
 
         if (response.status === 'success') {
             const newOrder = await addNewOrder(
-                userId, productsArray[0].vendor_id, productsArray[0].name, 'placed', orderJson, date, orderId,
+                userId, productsArray[0].vendor_id, productsArray[0].name, 'placed', orderJson, date, orderId, lastFour,
                 response.meta.authorization.transfer_account, response.meta.authorization.transfer_bank, 'Futterwave/eGurasa'
             );
 
@@ -74,6 +90,7 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
                 amount: response.meta.authorization.transfer_amount,
                 id: newOrder.insertId,
                 orderId: orderId,
+                lastFour: lastFour
             });
 
             const vendor = await queryVendorById(productsArray[0].vendor_id);

@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { query, Request, Response } from "express";
 import { CustomSessionData } from "../../types/session-types";
 import { queryStaffData } from "../../services/vendors/staff-queries";
-import { queryBaggedOrders, queryOrderByKey, queryPaidOrders, queryVendorOrderToBagged, queryVendorOrderToDelivered } from "../../services/vendors/order-queries";
+import { queryBaggedOrders, queryOrderByKey, queryOrderByLastFourAndUserId, queryOrderByUserIdExLastFour, queryPaidOrders, queryVendorOrderToBagged, queryVendorOrderToDelivered } from "../../services/vendors/order-queries";
 import { addNewNotification } from "../../services/users/notifications-queries";
 import { queryVendorData } from "../../services/vendors/vendor-queries";
 
@@ -109,9 +109,35 @@ const orderToDelivered = async (req: Request, res: Response) => {
     };
 };  //  end of orderToBagged
 
+
+// handler to retunr order
+const getBaggedByLastFourAndUserId = async (req: Request, res: Response) => {
+    try {
+        const lastFour = req.params.lastFour;
+        const userId = parseInt(req.params.userId);
+
+        if (!lastFour || !userId) return res.status(401).json({ message: 'Incomplete data sent to server to processing' });
+
+        const order = queryOrderByLastFourAndUserId(lastFour, userId);
+        const otherOrders = queryOrderByUserIdExLastFour(userId, lastFour);
+
+        const result = await Promise.all([order, otherOrders]);
+
+        res.json({
+            order: result[0],
+            others: result[1]
+        });
+    } catch (err) {
+        console.error('error in change order to bagged', err);
+        res.status(500).json({ message: 'Something went wrong' });
+    };
+};
+
+
 export {
     getPaidOrders,
     orderToBagged,
     orderToDelivered,
     getBaggedOrders,
+    getBaggedByLastFourAndUserId,
 };

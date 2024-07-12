@@ -57,12 +57,12 @@ const deleteDOrder = (id: number, userId: number): Promise<boolean> => {
 
 // add new order for one time account query
 const addNewOrder =
-    (userId: number, vendorId: number, vendorName: string, status: 'placed' | 'paid' | 'bagged' | 'delivered', orders: string, created_date: Date, order_id: string,
+    (userId: number, vendorId: number, vendorName: string, status: 'placed' | 'paid' | 'bagged' | 'delivered', orders: string, created_date: Date, order_id: string, lastFour: string,
         payment_account: string, payment_bank: string, payment_name: string): Promise<{ [keys: string]: string }> => {
         return new Promise<{ [keys: string]: string }>((resolve, reject) => {
-            const query = 'INSERT INTO orders (user_id, vendor_id, vendor_name, status, \`order\`, created_date, order_id, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            const query = 'INSERT INTO orders (user_id, vendor_id, vendor_name, status, \`order\`, created_date, order_id, last_four, last_four, payment_account, payment_bank, payment_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-            pool.query(query, [userId, vendorId, vendorName, status, orders, created_date, order_id, payment_account, payment_bank, payment_name], (err, result) => {
+            pool.query(query, [userId, vendorId, vendorName, status, orders, created_date, order_id, lastFour, payment_account, payment_bank, payment_name], (err, result) => {
                 if (err) {
                     console.error('an error ocured fetching defined order', err)
                     reject(err);
@@ -76,13 +76,13 @@ const addNewOrder =
 
 
 const addNewOrderForVAcc = (
-    userId: number, vendorId: number, vendorName: string, status: string, order: string, created_date: Date, payment_date: Date, order_id: string, accountName: string,
+    userId: number, vendorId: number, vendorName: string, status: string, order: string, created_date: Date, payment_date: Date, order_id: string, lastFour: string, accountName: string,
     accountNumber: string, bankName: string
 ): Promise<{ [keys: string]: string }> => {
     return new Promise<{ [keys: string]: string }>((resolve, reject) => {
-        const query = 'INSERT INTO orders (user_id, vendor_id, vendor_name, status, \`order\`, created_date, payment_date, order_id, payment_bank, payment_name, payment_account) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        const query = 'INSERT INTO orders (user_id, vendor_id, vendor_name, status, \`order\`, created_date, payment_date, order_id, last_four, payment_bank, payment_name, payment_account) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-        pool.query(query, [userId, vendorId, vendorName, status, order, created_date, payment_date, order_id, bankName, accountName, accountNumber], (err, result) => {
+        pool.query(query, [userId, vendorId, vendorName, status, order, created_date, payment_date, order_id, lastFour, bankName, accountName, accountNumber], (err, result) => {
             if (err) {
                 console.log('An error occurred while adding the order', err);
                 reject(err);

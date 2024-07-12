@@ -6,6 +6,7 @@ import { productsType, queryUserVenorProuctsById, queryVendorById } from "../../
 import calcTotalPrice from "../../modules/calc-order-total-price";
 import { addNewNotification } from "../../services/users/notifications-queries";
 import generateRandomAlphanumericCode from "../../modules/generate-random-string";
+import { queryOrderByLastFourAndUserId } from "../../services/vendors/order-queries";
 
 
 const initiateNewOrder = async (req: Request, res: Response) => {
@@ -57,9 +58,23 @@ const initiateNewOrder = async (req: Request, res: Response) => {
         // add order to database
         // @ts-ignore
         const orderId: string = generateRandomAlphanumericCode(15, false) // call functio to create new ordr id
+        // @ts-ignore
+        let lastFour: string = generateRandomAlphanumericCode(4, false);
+        let condition = true;
+
+        // a loop to run to ensure no user order exist with the specific last four for user
+        while (condition) {
+            const result = await queryOrderByLastFourAndUserId(lastFour, userId);
+            if (result[0]) {
+                condition = true;
+            } else {
+                condition = false;
+            };
+        };
+
         const ordersJson = JSON.stringify(orders);
         const addedOrder = await addNewOrderForVAcc(
-            userId, productsArray[0].vendor_id, vendorName, 'paid', ordersJson, created_date, payment_date, orderId, acc.account_name, acc.account_number, acc.bank_name
+            userId, productsArray[0].vendor_id, vendorName, 'paid', ordersJson, created_date, payment_date, orderId, lastFour, acc.account_name, acc.account_number, acc.bank_name
         );
 
         // add new ordr notification

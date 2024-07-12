@@ -1,8 +1,26 @@
 import pool from "../../modules/connectdb";
 
+type orderType = {
+    id: number;
+    order_id: string;
+    status: 'placed' | 'paid' | 'bagged' | 'delivered';
+    created_date: string;
+    payment_date: string;
+    bagged_data: string;
+    deliver_date: string;
+    payment_account: string;
+    payment_name: string;
+    payment_bank: string;
+    vendor_id: string;
+    order: any;
+    last_four: string;
+    delivered_by: string;
+};
+
+
 // query paid orders sorted by payment data
 const queryPaidOrders = (vendorId: number, pagin: number, limit: number) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<orderType[]>((resolve, reject) => {
         const query = 'SELECT * FROM orders WHERE vendor_id = ?  AND status = ? ORDER BY payment_date ASC LIMIT ? OFFSET ?';
 
         pool.query(query, [vendorId, 'paid', limit, pagin], (err, result) => {
@@ -74,10 +92,42 @@ const queryOrderByKey = (id: number): Promise<{ [keys: string]: string }> => {
     })
 };
 
+
+// query orders by last four and user id 
+const queryOrderByLastFourAndUserId = (lastFour: string, userId: number) => {
+    return new Promise<orderType[]>((resolve, reject) => {
+        const query = 'SELECT * FROM orders WHERE last_four = ? AND user_id = ?';
+
+        pool.query(query, [lastFour, userId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result);
+        });
+    });
+};
+
+
+// query to retunr order excluding
+const queryOrderByUserIdExLastFour = (userId: number, lastFour: string) => {
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT * FROM orders WHERE last_four NOT ? AND user_id = ?';
+
+        pool.query(query, [lastFour, userId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result);
+        });
+    });
+};
+
+
+
 export {
     queryPaidOrders,
     queryVendorOrderToBagged,
     queryOrderByKey,
     queryVendorOrderToDelivered,
     queryBaggedOrders,
+    queryOrderByLastFourAndUserId,
+    queryOrderByUserIdExLastFour,
 };
