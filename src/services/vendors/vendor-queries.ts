@@ -4,8 +4,10 @@ interface queryVendorDataType {
     id: number;
     name: string;
     about: string;
+    short_intro: string;
     created_at: Date;
 };
+
 
 const queryVendorData = (vendorId: number) => {
     return new Promise<queryVendorDataType>((resolve, reject) => {

@@ -6,6 +6,7 @@ interface CustomSessionData extends SessionData {
         email: string;
         type: 'normal' | 'admin' | 'super' | 'staff';
         id: number;
+        vendorId: number;
     }; // Define the type of the user object
 }
 

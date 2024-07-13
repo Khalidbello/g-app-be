@@ -14,6 +14,7 @@ const logInHandler = async (req: Request, res: Response) => {
 
         console.log('response .......', response)
         if (response && response.password === password) {
+            // @ts-ignore
             (req.session as CustomSessionData).user = {
                 email: email,
                 type: 'normal',
@@ -41,7 +42,8 @@ const handleStaffLogin = async (req: Request, res: Response) => {
             (req.session as CustomSessionData).user = {
                 email: email,
                 type: 'staff',
-                id: staff.id
+                id: staff.id,
+                vendorId: staff.vendor_id,
             };
             return res.status(200).json({ message: 'logged in succesfully' });
         };
@@ -64,7 +66,8 @@ const handleAdminLogin = async (req: Request, res: Response) => {
             (req.session as CustomSessionData).user = {
                 email: email,
                 type: 'admin',
-                id: admin.id
+                id: admin.id,
+                vendorId: admin.vendor_id,
             };
             return res.status(200).json({ message: 'logged in succesfully' });
         };
@@ -92,6 +95,7 @@ const createAccountHandler = async (req: Request, res: Response) => {
         const created = await createNewUser(firstName, lastName, email, phoneNumber, password, gender);
 
         if (created.affectedRows === 1) {
+            // @ts-ignore
             (req.session as CustomSessionData).user = {
                 email: email,
                 type: 'normal',
