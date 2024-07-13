@@ -57,7 +57,7 @@ const initiateNewOrder = async (req: Request, res: Response) => {
 
         // add order to database
         // @ts-ignore
-        const orderId: string = generateRandomAlphanumericCode(15, false) // call functio to create new ordr id
+        const orderId: string = generateRandomAlphanumericCode(6, false) // call functio to create new ordr id
         // @ts-ignore
         let lastFour: string = generateRandomAlphanumericCode(4, false);
         let condition = true;
@@ -69,6 +69,8 @@ const initiateNewOrder = async (req: Request, res: Response) => {
                 condition = true;
             } else {
                 condition = false;
+                // @ts-ignore
+                lastFour = generateRandomAlphanumericCode(4, false);
             };
         };
 

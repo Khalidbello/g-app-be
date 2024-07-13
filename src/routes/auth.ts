@@ -32,4 +32,15 @@ router.post('/staff-login', (req: Request, res: Response) => {
         res.status(500).json({ message: err });
     };
 });
+
+
+router.post('/admin-login', (req: Request, res: Response) => {
+    try {
+        handleStaffLogin(req, res);
+    } catch (err) {
+        console.error('an error occured in login');
+        res.status(500).json({ message: err });
+    };
+});
+
 export default router

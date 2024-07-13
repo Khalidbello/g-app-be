@@ -54,6 +54,8 @@ const generateOneTimeAcc = async (req: Request, res: Response) => {
                 condition = true;
             } else {
                 condition = false;
+                // @ts-ignore
+                lastFour = generateRandomAlphanumericCode(4, false);
             };
         };
 

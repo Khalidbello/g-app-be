@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { checkUserExist, createNewUser } from '../services/users/users-queries';
 import { CustomSessionData } from './../types/session-types';
 import { queryStaff } from '../services/staffs/auth-queries';
+import { queryAdmin } from '../services/admin/auth-query';
 
 
 // function to handle user login
@@ -52,6 +53,29 @@ const handleStaffLogin = async (req: Request, res: Response) => {
 };
 
 
+// funciton  to handle admin login
+const handleAdminLogin = async (req: Request, res: Response) => {
+    try {
+        const { email, password, vendorId } = req.body;
+        const admin = await queryAdmin(email, vendorId);
+
+        console.log('staffff', admin);
+        if (admin && admin.password === password) {
+            (req.session as CustomSessionData).user = {
+                email: email,
+                type: 'admin',
+                id: admin.id
+            };
+            return res.status(200).json({ message: 'logged in succesfully' });
+        };
+        res.status(404).json({ message: 'user with cridentials not found' });
+    } catch (err) {
+        console.error('error occurde in admin login', err);
+        res.status(500).json({ message: err });
+    };
+};
+
+
 // function to handle creating of new accont 
 const createAccountHandler = async (req: Request, res: Response) => {
     const { firstName, lastName, email, phoneNumber, password, gender } = req.body;
@@ -86,5 +110,6 @@ const createAccountHandler = async (req: Request, res: Response) => {
 export {
     logInHandler,
     createAccountHandler,
-    handleStaffLogin
+    handleStaffLogin,
+    handleAdminLogin,
 };
