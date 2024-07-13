@@ -1,4 +1,4 @@
-import { getVendorDp, getVendorinfo, uploadVendorDp } from "../handlers/admin/vendor-info";
+import { getVendorDp, getVendorinfo, updateVendorInfo, uploadVendorDp } from "../handlers/admin/vendor-info";
 import { CustomSessionData } from "../types/session-types";
 import { Router, Request, Response, NextFunction } from "express";
 
@@ -24,7 +24,7 @@ router.get('/vendor-info', (req: Request, res: Response) => getVendorinfo(req, r
 router.get('/vendor-dp', (req: Request, res: Response) => getVendorDp(req, res));
 
 
-router.get('/vendor-info', (req: Request, res: Response) => () => { });
+router.post('/vendor-info', (req: Request, res: Response) => updateVendorInfo(req, res));
 
 
 router.post('/vendor-dp', (req: Request, res: Response) => uploadVendorDp(req, res));

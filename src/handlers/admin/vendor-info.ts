@@ -3,7 +3,7 @@ import { queryVendorData } from "../../services/vendors/vendor-queries";
 import { CustomSessionData } from "../../types/session-types";
 import * as fs from 'fs/promises';
 import formidable from 'formidable';
-import { checkDpExists, queryAddVendorDp, queryGetVendorDp, queryUpdateVendorImaage } from "../../services/admin/store-queries";
+import { checkDpExists, queryAddVendorDp, queryGetVendorDp, queryUpdateVendorImaage, queryUpdateVendorInfo } from "../../services/admin/store-queries";
 
 const form = formidable();
 
@@ -32,7 +32,7 @@ const getVendorDp = async (req: Request, res: Response) => {
 
         if (!userDp) return res.status(404).json({ message: 'not dp found' });
 
-        userDp.dp = Buffer.from(userDp.dp).toString('base64');
+        userDp.image = Buffer.from(userDp.image).toString('base64');
 
         res.json(userDp);
     } catch (err) {
@@ -80,8 +80,28 @@ const uploadVendorDp = async (req: Request, res: Response) => {
 };  // end of uploadVendorDp
 
 
+// function to update vendor info
+const updateVendorInfo = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignore
+        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
+        const { vendorName, shortIntro, aboutVendor, address } = req.body;
+
+        if (!vendorName || !shortIntro || !aboutVendor || !address) return res.status(401).json({ message: 'Incomplete data sent to server for processing.' });
+
+        const updated = await queryUpdateVendorInfo(vendorId, vendorName, shortIntro, aboutVendor, address);
+
+        if (!updated) res.status(400).json({ message: 'Something went wrong.' });
+        res.json({ message: 'vendor info successfully updated.' })
+    } catch (err) {
+        console.error('error update vendor info', err);
+        res.status(500).json({ message: err });
+    };
+};
+
 export {
     getVendorinfo,
     uploadVendorDp,
     getVendorDp,
+    updateVendorInfo,
 }
