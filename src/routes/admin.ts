@@ -1,4 +1,4 @@
-import { addNewProduct } from "../handlers/admin/products";
+import { addNewProduct, getProducts, updateProductImage } from "../handlers/admin/products";
 import { getVendorDp, getVendorinfo, updateVendorInfo, uploadVendorDp } from "../handlers/admin/vendor-info";
 import { CustomSessionData } from "../types/session-types";
 import { Router, Request, Response, NextFunction } from "express";
@@ -29,8 +29,10 @@ router.post('/vendor-dp', (req: Request, res: Response) => uploadVendorDp(req, r
 
 router.get('/vendor-settings-count', (req: Request, res: Response) => () => { });
 
-router.get('/add-product', (req: Request, res: Response) => addNewProduct(req, res));
+router.get('/products/:pagin/:limit', (req: Request, res: Response) => getProducts(req, res));
 
-router.get('/edit-product-image', (req: Request, res: Response) => () => { });
+router.post('/add-product', (req: Request, res: Response) => addNewProduct(req, res));
+
+router.post('/edit-product-image/:productId', (req: Request, res: Response) => updateProductImage(req, res));
 
 export default router

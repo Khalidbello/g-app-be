@@ -1,6 +1,11 @@
 import { Response, Request } from "express";
 import { CustomSessionData } from "../../types/session-types";
-import { queryAddNewProduct, queryProductInfoByIndexAndVendorId } from "../../services/admin/product-queries";
+import { queryAddNewProduct, queryAddProductImage, queryProductInfoByIndexAndVendorId, queryProducts, queryProdutImageExists, queryUpdateProductImaage } from "../../services/admin/product-queries";
+import * as fs from 'fs/promises';
+import formidable from 'formidable';
+
+const form = formidable();
+
 
 // funciton to respond to products storage
 const addNewProduct = async (req: Request, res: Response) => {
@@ -27,10 +32,52 @@ const addNewProduct = async (req: Request, res: Response) => {
 };
 
 
-// funtion to update product image 
-const updateProductImage = (req: Request, res: Response) => {
+// functon to handle getting of products
+const getProducts = async (req: Request, res: Response) => {
     try {
+        // @ts-ignore
+        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
+        const { pagin, limit } = req.params;
+        const products = await queryProducts(vendorId, parseInt(pagin), parseInt(limit));
 
+        res.json(products);
+    } catch (err) {
+        console.error('an error occured in get products', err);
+        res.status(500).json({ message: err });
+    };
+};
+
+// funtion to update product image 
+const updateProductImage = async (req: Request, res: Response) => {
+    try {
+        const files: any = await new Promise((resolve, reject) => {
+            form.parse(req, (err: any, fields: any, files: any) => {
+                if (err) reject(err);
+
+                resolve(files)
+            });
+        });
+
+        // @ts-ignore
+        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
+        const productId: number = parseInt(req.params.productId);
+        const image = files.image[0];
+
+        if (!vendorId || !productId || !image) return res.status(400).json({ message: 'Incmplete data sent to server for processing' });
+
+        // check if dp exits for product bfore#
+        const imageExists = await queryProdutImageExists(productId, vendorId);
+        const imageBuffer = await fs.readFile(image.filepath);
+        let saved: boolean;
+
+        if (imageExists) {
+            saved = await queryUpdateProductImaage(productId, vendorId, imageBuffer);
+        } else {
+            saved = await queryAddProductImage(productId, vendorId, imageBuffer);
+        };
+
+        if (!saved) throw 'Something went wrong updating image';
+        res.json({ message: 'product image updated successfuly' });
     } catch (err) {
         console.error('an error occured in updating product image', err);
         res.status(500).json({ message: err });
@@ -38,7 +85,9 @@ const updateProductImage = (req: Request, res: Response) => {
 };
 
 
+
 export {
     addNewProduct,
     updateProductImage,
+    getProducts,
 }
