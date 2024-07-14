@@ -99,6 +99,9 @@ const updateVendorInfo = async (req: Request, res: Response) => {
     };
 };
 
+// function to get staff count and product count
+
+
 export {
     getVendorinfo,
     uploadVendorDp,
