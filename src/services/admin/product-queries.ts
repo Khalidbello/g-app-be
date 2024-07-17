@@ -9,6 +9,14 @@ interface productType {
 };
 
 
+interface productImageType {
+    product_id: number;
+    image: any;
+    vendor_id: number;
+    created_at: Date;
+};
+
+
 const queryProducts = (vendorId: number, pagin: number, limit: number) => {
     return new Promise<productType[]>((resolve, reject) => {
         const query = 'SELECT * FROM products WHERE vendor_id = ? LIMIT ? OFFSET ?';
@@ -25,7 +33,7 @@ const queryProducts = (vendorId: number, pagin: number, limit: number) => {
 
 const queryProductInfoByIndexAndVendorId = (vendorId: number, index: number) => {
     return new Promise<productType>((resolve, reject) => {
-        const query = 'SELECT * FROM products WHERE vendor_id = ? AND \'index\' = ?';
+        const query = 'SELECT * FROM products WHERE vendor_id = ? AND \`index\` = ?';
 
         pool.query(query, [vendorId, index], (err, result) => {
             if (err) return reject(err);
@@ -37,12 +45,12 @@ const queryProductInfoByIndexAndVendorId = (vendorId: number, index: number) => 
 
 
 // query to save new product
-const queryAddNewProduct = (name: string, price: number, index: number) => {
+const queryAddNewProduct = (vendorId: number, name: string, price: number, index: number) => {
     return new Promise<boolean>((resolve, reject) => {
         const date = new Date();
-        const query = 'INSERT INTO products (name, price, \'index\', created_at) VALUES (?, ?, ?, ?)';
+        const query = 'INSERT INTO products (vendor_id, name, price, \`index\`, created_at) VALUES (?, ?, ?, ?, ?)';
 
-        pool.query(query, [name, price, index, date], (err, result) => {
+        pool.query(query, [vendorId, name, price, index, date], (err, result) => {
             if (err) return reject(err);
 
             resolve(result.affectedRows > 0);
@@ -59,7 +67,7 @@ const queryProdutImageExists = (productId: number, vendorId: number) => {
         pool.query(query, [productId, vendorId], (err, result) => {
             if (err) return reject(err);
 
-            resolve(result[0]['COUNT(*)'])
+            resolve(result[0]['COUNT(*)']);
         });
     });
 };
@@ -94,6 +102,47 @@ const queryUpdateProductImaage = (productId: number, vendorId: number, imageBuff
 };
 
 
+// query tor return product image 
+const queryProductImage = (productId: number) => {
+    return new Promise<productImageType>((resolve, reject) => {
+        const query = 'SELECT * FROM product_images WHERE product_id = ? LIMIT 1';
+
+        pool.query(query, [productId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result[0]);
+        });
+    });
+};
+
+
+// query to update course
+const queryEditProduct = (vendorId: number, productId: number, name: string, index: number, price: number) => {
+    return new Promise<boolean>((resolve, reject) => {
+        const query = 'UPDATE products SET name = ?, \`index\` = ?, price = ? WHERE id = ? AND vendor_id = ?';
+
+        pool.query(query, [name, index, price, productId, vendorId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
+
+
+
+// query to delete product
+const queryDeleteProduct = (vendorId: number, productId: number) => {
+    return new Promise<boolean>((resolve, reject) => {
+        const query = 'DELETE FROM products WHERE product_id = ? AND vendor_id = ?';
+
+        pool.query(query, [productId, vendorId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
 
 export {
     queryProducts,
@@ -102,4 +151,7 @@ export {
     queryProdutImageExists,
     queryAddProductImage,
     queryUpdateProductImaage,
+    queryProductImage,
+    queryEditProduct,
+    queryDeleteProduct,
 }

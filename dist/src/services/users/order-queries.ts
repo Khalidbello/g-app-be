@@ -67,10 +67,10 @@ const addNewOrder = (user: string, status: string, gurasa: number, suya: number,
             } else {
                 console.log(result);
                 resolve(result);
-            }
-        })
-    })
-}
+            };
+        });
+    });
+};
 
 
 // query to fetch user orders 
@@ -101,8 +101,10 @@ const queryOrderById = (email: string | undefined, id: number): Promise<{ [keys:
             } else {
                 console.log(result);
                 resolve(result);
-            }
-        })
-    })
-}
+            };
+        });
+    });
+};
+
+
 export { saveDOrder, retrieveDOrder, deleteDOrder, addNewOrder, getPlacedOrders, queryOrderById };
