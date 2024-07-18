@@ -6,6 +6,7 @@ interface queryVendorDataType {
     about: string;
     short_intro: string;
     created_at: Date;
+    image: string;
 };
 
 
@@ -23,5 +24,5 @@ const queryVendorData = (vendorId: number) => {
 
 
 export {
-    queryVendorData
+    queryVendorData,
 };

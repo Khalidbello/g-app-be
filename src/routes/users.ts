@@ -7,7 +7,7 @@ import { confirmEmailOtp, generateConfirmEmailOtp, getCheckEmailVerify } from '.
 import { getUserProfileData, handleChangeNames, handleChangePassword } from '../handlers/users/profile';
 import { generateOneTimeAcc } from '../handlers/gateway';
 import { checkUnViewedNotiication, getNotifications, setNotToViewed } from '../handlers/users/notification';
-import { getProducts, getVendors } from '../handlers/users/user-vendors';
+import { getProducts, getVendorInfo, getVendors } from '../handlers/users/user-vendors';
 
 
 const router = Router();
@@ -15,7 +15,9 @@ const router = Router();
 
 //=========================================================================================================
 // vendor user related routes
-router.get('/products/:vendorId/:pagin/:limit', (req: Request, res: Response) => getProducts(req, res));
+router.get('/vendor-products/:vendorId/:pagin/:limit', (req: Request, res: Response) => getProducts(req, res));
+
+router.get('/vendor-info/:vendorId', (req: Request, res: Response) => getVendorInfo(req, res));
 
 
 router.use((req: Request, res: Response, next: NextFunction) => {
@@ -46,13 +48,15 @@ router.post('/create-v-acc', (req: Request, res: Response) => createVAcc(req, re
 //==========================================================================================================
 // route related to defined orders
 
-// route for creating vietual  account
+// route for creating order for users wih virtual accoutn
 router.post('/create-d-order', (req: Request, res: Response) => createDOrder(req, res));
 
 router.delete('/delete-d-order/:id', (req: Request, res: Response) => removeDOrder(req, res));
 
+
 // rote to get defined orders
 router.get('/defined-orders/:count/:limit', (req: Request, res: Response) => getDOrders(req, res));
+
 
 // routes related to vendors
 router.get('/vendors/:pagin/:limit', (req: Request, res: Response) => getVendors(req, res))

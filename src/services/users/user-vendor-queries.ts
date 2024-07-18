@@ -5,6 +5,7 @@ interface getVendors {
     id: number;
     about: string;
     name: string;
+    image: string;
     created_at: Date;
 };
 

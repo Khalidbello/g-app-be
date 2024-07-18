@@ -6,20 +6,15 @@ interface productType {
     name: string;
     price: number;
     vendor_id: number;
+    image: string | null;
 };
 
 
-interface productImageType {
-    product_id: number;
-    image: any;
-    vendor_id: number;
-    created_at: Date;
-};
 
 
 const queryProducts = (vendorId: number, pagin: number, limit: number) => {
     return new Promise<productType[]>((resolve, reject) => {
-        const query = 'SELECT * FROM products WHERE vendor_id = ? LIMIT ? OFFSET ?';
+        const query = 'SELECT * FROM products WHERE vendor_id = ?   ORDER BY \`index\` ASC LIMIT ? OFFSET ?';
 
         pool.query(query, [vendorId, limit, pagin], (err, result) => {
             if (err) return reject(err);
@@ -91,7 +86,7 @@ const queryAddProductImage = (productId: number, vendorId: number, imageBuffer: 
 // to update product image
 const queryUpdateProductImaage = (productId: number, vendorId: number, imageBuffer: Buffer) => {
     return new Promise<boolean>((resolve, reject) => {
-        const query = 'UPDATE product_images SET image = ? WHERE product_id = ? AND vendor_id = ?';
+        const query = 'UPDATE products SET image = ? WHERE id = ? AND vendor_id = ?';
 
         pool.query(query, [imageBuffer, productId, vendorId], (err, result) => {
             if (err) return reject(err);
@@ -100,21 +95,6 @@ const queryUpdateProductImaage = (productId: number, vendorId: number, imageBuff
         });
     });
 };
-
-
-// query tor return product image 
-const queryProductImage = (productId: number) => {
-    return new Promise<productImageType>((resolve, reject) => {
-        const query = 'SELECT * FROM product_images WHERE product_id = ? LIMIT 1';
-
-        pool.query(query, [productId], (err, result) => {
-            if (err) return reject(err);
-
-            resolve(result[0]);
-        });
-    });
-};
-
 
 // query to update course
 const queryEditProduct = (vendorId: number, productId: number, name: string, index: number, price: number) => {
@@ -132,9 +112,9 @@ const queryEditProduct = (vendorId: number, productId: number, name: string, ind
 
 
 // query to delete product
-const queryDeleteProduct = (vendorId: number, productId: number) => {
+const queryDeleteProduct = (productId: number, vendorId: number) => {
     return new Promise<boolean>((resolve, reject) => {
-        const query = 'DELETE FROM products WHERE product_id = ? AND vendor_id = ?';
+        const query = 'DELETE FROM products WHERE id = ? AND vendor_id = ?';
 
         pool.query(query, [productId, vendorId], (err, result) => {
             if (err) return reject(err);
@@ -151,7 +131,6 @@ export {
     queryProdutImageExists,
     queryAddProductImage,
     queryUpdateProductImaage,
-    queryProductImage,
     queryEditProduct,
     queryDeleteProduct,
 }

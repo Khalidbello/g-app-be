@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CustomSessionData } from "../../types/session-types";
-import { queryAdminCreateUser, queryAdminStaffExist } from "../../services/admin/staff-queries";
+import { queryAdminCreateStaff, queryAdminStaffExist, queryRemoveStaff, queryUpdateStaff } from "../../services/admin/staff-queries";
 
 // function handler to create new staff
 const createStaff = async (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ const createStaff = async (req: Request, res: Response) => {
 
         if (staffExits) return res.status(401).json({ messag: 'user staff with email already exist in this organisation' });
 
-        const created = await queryAdminCreateUser(vendorId, firstName, lastName, email, password);
+        const created = await queryAdminCreateStaff(vendorId, firstName, lastName, email, password);
 
         if (!created) throw 'Something went wrong creating staff';
         res.json({ message: 'Staff created successfully.' });
@@ -31,8 +31,22 @@ const editStaff = async (req: Request, res: Response) => {
     try {
         // @ts-ignore 
         const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
-        const staffId:number = parseInt(req.params.staffId);
-        
+        const staffId: number = parseInt(req.params.staffId);
+        const { firstName, lastName, email, password } = req.body;
+
+        if (!firstName || !lastName || !email || !password) return res.status(400).json({ message: 'Incomplete data sent to server for processing.' });
+
+        const staffExits = await queryAdminStaffExist(email, vendorId);
+
+        if (staffExits) {
+            if (staffExits.id !== staffId) return res.status(401).json({ message: 'A staff with this email already exits' });
+        };
+
+        const updated = await queryUpdateStaff(firstName, lastName, email, password, staffId, vendorId);
+
+        if (!updated) throw 'Something went wrong updating staff';
+
+        res.json({ message: 'staff updated successsfully' });
     } catch (err) {
         console.error('an error occured editing  staff', err);
         res.status(500).json({ message: err });
@@ -40,6 +54,25 @@ const editStaff = async (req: Request, res: Response) => {
 };
 
 
+// function to remove staff
+const removeStaff = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignore 
+        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
+        const staffId: number = parseInt(req.params.staffId);
+        const removed = await queryRemoveStaff(staffId, vendorId);
+
+        if (!removed) throw 'Something went wrong removing staff';
+
+        res.json({ message: 'staff removed successsfully' });
+    } catch (err) {
+        console.error('an error occured removing  staff', err);
+        res.status(500).json({ message: err });
+    };
+}
+
 export {
     createStaff,
+    editStaff,
+    removeStaff,
 }

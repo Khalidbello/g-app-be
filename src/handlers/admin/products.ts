@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import { CustomSessionData } from "../../types/session-types";
-import { queryAddNewProduct, queryAddProductImage, queryDeleteProduct, queryEditProduct, queryProductImage, queryProductInfoByIndexAndVendorId, queryProducts, queryProdutImageExists, queryUpdateProductImaage } from "../../services/admin/product-queries";
+import { queryAddNewProduct, queryDeleteProduct, queryEditProduct, queryProductInfoByIndexAndVendorId, queryProducts, queryProdutImageExists, queryUpdateProductImaage } from "../../services/admin/product-queries";
 import * as fs from 'fs/promises';
 import formidable from 'formidable';
 
@@ -39,6 +39,12 @@ const getProducts = async (req: Request, res: Response) => {
         const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
         const { pagin, limit } = req.params;
         const products = await queryProducts(vendorId, parseInt(pagin), parseInt(limit));
+        const length: number = products.length;
+
+        for (let i = 0; i < length; i++) {
+            // @ts-ignore
+            products[i].image = products[i].image ? Buffer.from(products[i].image).toString('base64') : null;
+        };
 
         res.json(products);
     } catch (err) {
@@ -65,39 +71,13 @@ const updateProductImage = async (req: Request, res: Response) => {
 
         if (!vendorId || !productId || !image) return res.status(400).json({ message: 'Incmplete data sent to server for processing' });
 
-        // check if dp exits for product bfore#
-        const imageExists = await queryProdutImageExists(productId, vendorId);
         const imageBuffer = await fs.readFile(image.filepath);
-        let saved: boolean;
-
-        if (imageExists) {
-            saved = await queryUpdateProductImaage(productId, vendorId, imageBuffer);
-        } else {
-            saved = await queryAddProductImage(productId, vendorId, imageBuffer);
-        };
+        const saved = await queryUpdateProductImaage(productId, vendorId, imageBuffer);
 
         if (!saved) throw 'Something went wrong updating image';
         res.json({ message: 'product image updated successfuly' });
     } catch (err) {
         console.error('an error occured in updating product image', err);
-        res.status(500).json({ message: err });
-    };
-};
-
-
-// function to return product image 
-const getProductImage = async (req: Request, res: Response) => {
-    try {
-        const productId: number = parseInt(req.params.productId);
-
-        const result = await queryProductImage(productId);
-
-        if (!result) return res.status(404).json({ message: 'No image found for this product' });
-
-        result.image = Buffer.from(result.image).toString('base64');
-        res.json({ image: result });
-    } catch (err) {
-        console.error('an error occured getting product image', err);
         res.status(500).json({ message: err });
     };
 };
@@ -147,7 +127,6 @@ export {
     addNewProduct,
     updateProductImage,
     getProducts,
-    getProductImage,
     editProduct,
     deleteProduct,
 };

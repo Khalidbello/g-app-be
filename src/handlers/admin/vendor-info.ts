@@ -3,7 +3,7 @@ import { queryVendorData } from "../../services/vendors/vendor-queries";
 import { CustomSessionData } from "../../types/session-types";
 import * as fs from 'fs/promises';
 import formidable from 'formidable';
-import { checkDpExists, queryAddVendorDp, queryGetVendorDp, queryUpdateVendorImaage, queryUpdateVendorInfo } from "../../services/admin/store-queries";
+import { checkDpExists, queryGetVendorDp, queryUpdateVendorImaage, queryUpdateVendorInfo } from "../../services/admin/store-queries";
 
 const form = formidable();
 
@@ -13,31 +13,12 @@ const getVendorinfo = async (req: Request, res: Response) => {
         // @ts-ignore
         const vendorId: number = (req.session as CustomSessionData).user?.vendorId
         const vendorData = await queryVendorData(vendorId);
+        vendorData.image = Buffer.from(vendorData.image).toString('base64');
 
         res.json(vendorData)
     } catch (err) {
         console.error('error in getting vendor info', err);
         res.status(500).json({ message: 'Something went wrong' });
-    };
-};
-
-
-
-// route to retunr user profile pucture 
-const getVendorDp = async (req: Request, res: Response) => {
-    try {
-        // @ts-ignore
-        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
-        const userDp = await queryGetVendorDp(vendorId);
-
-        if (!userDp) return res.status(404).json({ message: 'not dp found' });
-
-        userDp.image = Buffer.from(userDp.image).toString('base64');
-
-        res.json(userDp);
-    } catch (err) {
-        console.error('error in getting vendor do', err);
-        res.status(500).json({ message: err });
     };
 };
 
@@ -61,14 +42,10 @@ const uploadVendorDp = async (req: Request, res: Response) => {
         if (!vendorId || !file) return res.status(400).json({ message: 'Incomplete data sent to server for processing' });
 
         const imageBuffer = await fs.readFile(file.filepath);
-        const dpExists = await checkDpExists(vendorId);
         let saved;
 
-        if (dpExists) {
-            saved = queryUpdateVendorImaage(vendorId, imageBuffer);
-        } else {
-            saved = queryAddVendorDp(vendorId, imageBuffer);
-        };
+        saved = queryUpdateVendorImaage(vendorId, imageBuffer);
+
 
         if (!saved) throw 'Error saving user dp';
 
@@ -105,6 +82,5 @@ const updateVendorInfo = async (req: Request, res: Response) => {
 export {
     getVendorinfo,
     uploadVendorDp,
-    getVendorDp,
     updateVendorInfo,
 }

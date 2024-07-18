@@ -22,7 +22,7 @@ const checkDpExists = (vendorId: number) => {
 // query get vendor Id
 const queryGetVendorDp = (vendorId: number): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
-        const query = 'SELECT * FROM vendor_image WHERE vendor_id = ? LIMIT 1';
+        const query = 'SELECT image FROM vendors WHERE id = ? LIMIT 1';
 
         pool.query(query, [vendorId], (err, result) => {
             if (err) return reject(err);
@@ -33,25 +33,10 @@ const queryGetVendorDp = (vendorId: number): Promise<any> => {
 };
 
 
-// to insert new vendor dp
-const queryAddVendorDp = (vendorId: number, imageBuffer: Buffer) => {
-    return new Promise<boolean>((resolve, reject) => {
-        const date = new Date();
-        const query = 'INSERT INTO vendor_image (image, vendor_id, created_at) VALUES (?, ?, ?)';
-
-        pool.query(query, [imageBuffer, vendorId, date], (err, result) => {
-            if (err) return reject(err);
-
-            resolve(result.affectedRows > 0);
-        });
-    });
-};
-
-
 // to update vendor dp
 const queryUpdateVendorImaage = (userId: number, imageBuffer: Buffer) => {
     return new Promise<boolean>((resolve, reject) => {
-        const query = 'UPDATE vendor_image SET image = ? WHERE vendor_id = ?';
+        const query = 'UPDATE vendors SET image = ? WHERE id = ?';
 
         pool.query(query, [imageBuffer, userId], (err, result) => {
             if (err) return reject(err);
@@ -79,7 +64,6 @@ const queryUpdateVendorInfo = (vendorId: number, vendorName: string, shortIntro:
 export {
     checkDpExists,
     queryUpdateVendorImaage,
-    queryAddVendorDp,
     queryGetVendorDp,
     queryUpdateVendorInfo,
 };
