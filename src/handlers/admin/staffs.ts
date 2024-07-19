@@ -1,6 +1,22 @@
 import { Request, Response } from "express";
 import { CustomSessionData } from "../../types/session-types";
-import { queryAdminCreateStaff, queryAdminStaffExist, queryRemoveStaff, queryUpdateStaff } from "../../services/admin/staff-queries";
+import { queryAdminCreateStaff, queryAdminStaffExist, queryRemoveStaff, queryStaffs, queryUpdateStaff } from "../../services/admin/staff-queries";
+
+// hnadler to fetch staff
+const getStaffs = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignore
+        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
+        const { pagin, limit } = req.params;
+        const staffs = await queryStaffs(vendorId, parseInt(pagin), parseInt(limit));
+
+        res.json(staffs);
+    } catch (err) {
+        console.error('an error occured in get staffs', err);
+        res.status(500).json({ message: err });
+    };
+};
+
 
 // function handler to create new staff
 const createStaff = async (req: Request, res: Response) => {
@@ -9,6 +25,7 @@ const createStaff = async (req: Request, res: Response) => {
         const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
         const { firstName, lastName, email, password } = req.body;
 
+        console.log(firstName, lastName, email, password, 'staff create data');
         if (!firstName || !lastName || !email || !password) return res.status(400).json({ message: 'Incomplete data sent to server for processing.' });
 
         const staffExits = await queryAdminStaffExist(email, vendorId);
@@ -72,6 +89,7 @@ const removeStaff = async (req: Request, res: Response) => {
 }
 
 export {
+    getStaffs,
     createStaff,
     editStaff,
     removeStaff,

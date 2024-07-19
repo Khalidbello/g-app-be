@@ -1,5 +1,5 @@
 import { addNewProduct, deleteProduct, editProduct, getProducts, updateProductImage } from "../handlers/admin/products";
-import { createStaff, editStaff, removeStaff } from "../handlers/admin/staffs";
+import { createStaff, editStaff, getStaffs, removeStaff } from "../handlers/admin/staffs";
 import { getVendorinfo, updateVendorInfo, uploadVendorDp } from "../handlers/admin/vendor-info";
 import { CustomSessionData } from "../types/session-types";
 import { Router, Request, Response, NextFunction } from "express";
@@ -41,11 +41,13 @@ router.post('/edit-product-image/:productId', (req: Request, res: Response) => u
 
 
 // staff related routes
-router.post('/add-staff', (req: Request, res: Response) => createStaff(req, res));
+router.get('/staffs/:pagin/:limit', (req: Request, res: Response) => getStaffs(req, res));
 
-router.patch('/edit-staff/:staffId', (req: Request, res: Response) => editStaff(req, res));
+router.post('/add-staff', (req: Request, res: Response) => createStaff(req, res)); 
 
-router.post('/remove-staff/:staffId', (req: Request, res: Response) => removeStaff(req, res));
+router.post('/edit-staff/:staffId', (req: Request, res: Response) => editStaff(req, res));
+
+router.delete('/remove-staff/:staffId', (req: Request, res: Response) => removeStaff(req, res));
 
 
 router.get('/vendor-settings-count', (req: Request, res: Response) => () => { });
