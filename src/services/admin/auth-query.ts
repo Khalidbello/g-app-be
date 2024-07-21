@@ -13,7 +13,7 @@ interface amdinType {
 
 const queryAdmin = (email: string, vendorId: number) => {
     return new Promise<amdinType>((resolve, reject) => {
-        const query = 'SELECT * FROM staff WHERE email = ? AND vendor_id = ? AND type = ?';
+        const query = 'SELECT * FROM staffs WHERE email = ? AND vendor_id = ? AND type = ?';
 
         pool.query(query, [email, vendorId, 'admin'], (err, result) => {
             if (err) return reject(err);

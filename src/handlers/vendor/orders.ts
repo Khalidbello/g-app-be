@@ -1,9 +1,9 @@
 import { query, Request, Response } from "express";
 import { CustomSessionData } from "../../types/session-types";
-import { queryStaffData } from "../../services/vendors/staff-queries";
-import { queryBaggedOrders, queryOrderByKey, queryOrderByLastFourAndUserId, queryOrderByUserIdExLastFour, queryPaidOrders, queryVendorOrderToBagged, queryVendorOrderToDelivered } from "../../services/vendors/order-queries";
+import { queryStaffData } from "../../services/staffs/staff-queries";
+import { queryBaggedOrders, queryOrderByKey, queryOrderByLastFourAndUserId, queryOrderByUserIdExLastFour, queryPaidOrders, queryVendorOrderToBagged, queryVendorOrderToDelivered } from "../../services/staffs/order-queries";
 import { addNewNotification } from "../../services/users/notifications-queries";
-import { queryVendorData } from "../../services/vendors/vendor-queries";
+import { queryVendorData } from "../../services/staffs/vendor-queries";
 
 const getPaidOrders = async (req: Request, res: Response) => {
     try {

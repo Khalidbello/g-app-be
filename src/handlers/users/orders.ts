@@ -6,7 +6,7 @@ import { productsType, queryUserVenorProuctsById, queryVendorById } from "../../
 import calcTotalPrice from "../../modules/calc-order-total-price";
 import { addNewNotification } from "../../services/users/notifications-queries";
 import generateRandomAlphanumericCode from "../../modules/generate-random-string";
-import { queryOrderByLastFourAndUserId } from "../../services/vendors/order-queries";
+import { queryOrderByLastFourAndUserId } from "../../services/staffs/order-queries";
 
 
 const initiateNewOrder = async (req: Request, res: Response) => {

@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import { CustomSessionData } from "../../types/session-types";
 import { queryAdminCreateStaff, queryAdminStaffExist, queryRemoveStaff, queryStaffs, queryUpdateStaff } from "../../services/admin/staff-queries";
+import staffAccountVerificationLinkSender from "../../modules/admin/send-staff-activation-mail";
 
 // hnadler to fetch staff
 const getStaffs = async (req: Request, res: Response) => {
@@ -36,6 +37,8 @@ const createStaff = async (req: Request, res: Response) => {
 
         if (!created) throw 'Something went wrong creating staff';
         res.json({ message: 'Staff created successfully.' });
+        const response = await staffAccountVerificationLinkSender(vendorId, email);
+        console.log(response);
     } catch (err) {
         console.error('an error occured creating new staff', err);
         res.status(500).json({ message: err });

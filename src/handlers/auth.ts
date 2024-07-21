@@ -59,9 +59,10 @@ const handleStaffLogin = async (req: Request, res: Response) => {
 const handleAdminLogin = async (req: Request, res: Response) => {
     try {
         const { email, password, vendorId } = req.body;
+
         const admin = await queryAdmin(email, vendorId);
 
-        console.log('staffff', admin);
+        console.log('admin', admin);
         if (admin && admin.password === password) {
             (req.session as CustomSessionData).user = {
                 email: email,

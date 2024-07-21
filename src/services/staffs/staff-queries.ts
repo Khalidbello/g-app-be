@@ -26,3 +26,5 @@ const queryStaffData = (staffId: number) => {
 export {
     queryStaffData,
 };
+
+export type { queryStaffDataType }

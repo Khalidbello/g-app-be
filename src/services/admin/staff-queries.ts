@@ -32,9 +32,9 @@ const queryAdminStaffExist = (email: string, vendorId: number) => {
 const queryAdminCreateStaff = (vendorId: number, firstName: string, lastName: string, email: string, password: string) => {
     return new Promise<boolean>((resolve, reject) => {
         const date = new Date();
-        const query = 'INSERT INTO staffs (vendor_id, first_name, last_name, email, password, type,  created_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const query = 'INSERT INTO staffs (vendor_id, first_name, last_name, email, password, type,  created_at, activated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-        pool.query(query, [vendorId, firstName, lastName, email, password, 'staff', date], (err, result) => {
+        pool.query(query, [vendorId, firstName, lastName, email, password, 'staff', date, false], (err, result) => {
             if (err) return reject(err);
 
             resolve(result.affectedRows > 0);
@@ -71,10 +71,51 @@ const queryRemoveStaff = (staffId: number, vendorId: number) => {
     });
 };
 
+
+interface staffType {
+    id: number;
+    first_name: string;
+    last_name: string;
+    vendor_id: number;
+    email: string;
+    created_at: Date;
+    password: string;
+};
+
+const queryStaffForActivation = (email: string, vendorId: number): Promise<staffType> => {
+    console.log('inquery email, vendorId', email, vendorId);
+    return new Promise<staffType>((resolve, reject) => {
+        const query = 'SELECT * FROM staffs WHERE email = ? AND vendor_id = ? AND activated != ?';
+
+        pool.query(query, [email, vendorId, true], (err, result) => {
+            if (err) return reject(err)
+
+            resolve(result[0]);
+        });
+    });
+};
+
+
+
+const querySaveAccActivationCode = async (id: number, accActivationCode: string) => {
+    return new Promise<boolean>((resolve, reject) => {
+        const query = 'UPDATE staffs SET verification_code = ? WHERE id = ? AND activated != ?';
+
+        pool.query(query, [accActivationCode, id, true], (err, result) => {
+            if (err) return reject(err)
+
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
+
+
 export {
     queryStaffs,
     queryAdminStaffExist,
     queryAdminCreateStaff,
     queryUpdateStaff,
     queryRemoveStaff,
-}
+    queryStaffForActivation,
+    querySaveAccActivationCode,
+};

@@ -61,9 +61,31 @@ const queryUpdateVendorInfo = (vendorId: number, vendorName: string, shortIntro:
 };
 
 
+interface vendorInfoTYpe {
+    name: string;
+    short_intro: string;
+    about: string;
+    address: string;
+};
+
+// query t get vendor info without image 
+const queryVendorInfoById = (id: number): Promise<vendorInfoTYpe> => {
+    return new Promise<vendorInfoTYpe>((resolve, reject) => {
+        const query = 'SELECT name, short_intro, about, address FROM vendors WHERE id =?';
+
+        pool.query(query, [id], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result[0]);
+        });
+    });
+};
+
+
 export {
     checkDpExists,
     queryUpdateVendorImaage,
     queryGetVendorDp,
     queryUpdateVendorInfo,
+    queryVendorInfoById,
 };

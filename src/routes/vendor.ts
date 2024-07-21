@@ -1,10 +1,19 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { CustomSessionData } from "../types/session-types";
 import { getBaggedByLastFourAndUserId, getBaggedOrders, getPaidOrders, orderToBagged, orderToDelivered } from "../handlers/vendor/orders";
+import { activateAccount, checkVerificationCode } from "../handlers/vendor/account-activation";
 
 const router = Router();
 
 
+//======================================================================================================================================================
+// routes related to staff account activation
+router.get('/check-vc/:vc', (req: Request, res: Response) => checkVerificationCode(req, res));
+
+router.post('/activate-account', (req: Request, res: Response)=> activateAccount(req, res))
+
+//==============================================================================================================================================
+// permission checker
 router.use((req: Request, res: Response, next: NextFunction) => {
     if (
         (req.session as CustomSessionData).user?.email && (
@@ -30,5 +39,6 @@ router.get('/bagged-orders', (req: Request, res: Response) => getBaggedOrders(re
 router.get('/search/:lastFour/:userId', (req: Request, res: Response) => getBaggedByLastFourAndUserId(req, res));
 
 router.patch('/update-order-to-delivered/:orderKey', (req: Request, res: Response) => orderToDelivered(req, res));
+
 
 export default router;

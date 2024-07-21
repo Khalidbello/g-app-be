@@ -9,7 +9,12 @@ const getVendors = async (req: Request, res: Response) => {
         if (!limit || !pagin) return res.status(400).json({ message: 'incomplete data sent to sever for processng.' });
 
         const vendors = await queryVendors(parseInt(limit), parseInt(pagin));
+        const length: number = vendors.length;
 
+        for (let i = 0; i < length; i++) {
+            // @ts-ignore
+            vendors[i].image = vendors[i].image ? Buffer.from(vendors[i].image).toString('base64') : null;
+        };
         res.json(vendors);
     } catch (err) {
         console.error('error in get vendors', err)

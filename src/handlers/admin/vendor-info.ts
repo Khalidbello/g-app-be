@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { queryVendorData } from "../../services/vendors/vendor-queries";
+import { queryVendorData } from "../../services/staffs/vendor-queries";
 import { CustomSessionData } from "../../types/session-types";
 import * as fs from 'fs/promises';
 import formidable from 'formidable';

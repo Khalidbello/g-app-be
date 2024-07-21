@@ -7,7 +7,7 @@ import { updateOrderPaid } from "../services/users/order-queries-2";
 import { addNewNotification } from "../services/users/notifications-queries";
 import { productsType, queryUserVenorProuctsById, queryVendorById } from "../services/users/user-vendor-queries";
 import calcTotalPrice from "../modules/calc-order-total-price";
-import { queryOrderByLastFourAndUserId } from "../services/vendors/order-queries";
+import { queryOrderByLastFourAndUserId } from "../services/staffs/order-queries";
 const Flutterwave = require('flutterwave-node-v3');
 const fs = require('fs');
 

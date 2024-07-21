@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { logInHandler, createAccountHandler, handleStaffLogin } from './../handlers/auth';
+import { logInHandler, createAccountHandler, handleStaffLogin, handleAdminLogin } from './../handlers/auth';
 import pool from '../modules/connectdb';
 
 const router = Router();
@@ -36,7 +36,7 @@ router.post('/staff-login', (req: Request, res: Response) => {
 
 router.post('/admin-login', (req: Request, res: Response) => {
     try {
-        handleStaffLogin(req, res);
+        handleAdminLogin(req, res);
     } catch (err) {
         console.error('an error occured in login');
         res.status(500).json({ message: err });

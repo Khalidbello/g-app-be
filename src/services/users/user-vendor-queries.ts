@@ -9,8 +9,8 @@ interface getVendors {
     created_at: Date;
 };
 
-const queryVendors = (limit: number, pagin: number): Promise<getVendors> => {
-    return new Promise<getVendors>((resolve, reject) => {
+const queryVendors = (limit: number, pagin: number): Promise<getVendors[]> => {
+    return new Promise<getVendors[]>((resolve, reject) => {
         const query = 'SELECT * FROM vendors LIMIT ? OFFSET ?';
 
         pool.query(query, [limit, pagin], (err, result) => {
