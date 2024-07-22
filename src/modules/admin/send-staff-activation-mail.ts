@@ -2,6 +2,7 @@ const handleBars = require('handlebars');
 const fs = require('fs');
 import { querySaveAccActivationCode, queryStaffForActivation } from "../../services/admin/staff-queries";
 import { queryVendorInfoById } from "../../services/admin/store-queries";
+import { queryVcDetails } from "../../services/staffs/account-activation-queries";
 import sendEmail from "../emailers/email-sender";
 import generateRandomAlphanumericCode from "../generate-random-string";
 
@@ -9,7 +10,18 @@ const staffAccountVerificationLinkSender = async (vendorId: number, staffEmail: 
     try {
         console.log('in verification email sender', vendorId, staffEmail)
         // @ts-ignore
-        const code: string = generateRandomAlphanumericCode(12, false);
+        let code: string = generateRandomAlphanumericCode(20, false);
+        let loop = true; // flag to determine wether loop continues or break
+        let count = 0  // to keep count of hw many time the loop have run
+
+        // check if staff with code already exit if true regenerate
+        while (loop) {
+            const condition = await queryVcDetails(code);
+            if (!condition) loop = false;
+            if (count > 5) return false;
+            count++;
+        };
+
         const vendorInfo = await queryVendorInfoById(vendorId);
         const staffInfo = await queryStaffForActivation(staffEmail, vendorId);
 
