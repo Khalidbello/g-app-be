@@ -8,7 +8,7 @@ const checkVerificationCode = async (req: Request, res: Response) => {
         const verifictionCode: string = req.params.vc;
         const checkVcExists = await queryVcDetails(verifictionCode);
 
-        if (!checkVcExists) return res.json({ message: 'No valid use case found for the provided verification code' });
+        if (!checkVcExists) return res.status(404).json({ message: 'No valid use case found for the provided verification code' });
 
         const vendorInfo = await queryVendorById(checkVcExists.vendor_id);
 
@@ -18,8 +18,8 @@ const checkVerificationCode = async (req: Request, res: Response) => {
             vendorId: vendorInfo.id
         });
     } catch (err) {
-        console.error('An error occured confirmin verification code', err);
-        res.json({ message: err });
+        console.error('An error occured confirming verification code', err);
+        res.status(500).json({ message: err });
     };
 };
 
@@ -28,6 +28,7 @@ const checkVerificationCode = async (req: Request, res: Response) => {
 const activateAccount = async (req: Request, res: Response) => {
     try {
         const { password, confirmPassword, vc } = req.body;
+        console.log('in activate staff account', password, confirmPassword, vc);
 
         if (!password || !confirmPassword || !vc) return res.status(400).json({ mssage: 'Incomplete data sent to servr for processing' });
         if (password !== confirmPassword) return res.status(401).json({ message: 'password mismatch' });
@@ -39,7 +40,7 @@ const activateAccount = async (req: Request, res: Response) => {
         res.json({ message: 'Account activation succesfull' });
     } catch (err) {
         console.error('An error occured account activation', err);
-        res.json({ message: err });
+        res.status(500).json({ message: err });
     };
 };
 

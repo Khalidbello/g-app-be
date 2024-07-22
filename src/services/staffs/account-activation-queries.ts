@@ -3,7 +3,7 @@ import { queryStaffDataType } from "./staff-queries";
 
 const queryVcDetails = (verificationCode: string) => {
     return new Promise<queryStaffDataType>((resolve, reject) => {
-        const query = 'SELECT * WHERE verification_code = ?';
+        const query = 'SELECT * FROM staffs WHERE verification_code = ?';
 
         pool.query(query, [verificationCode], (err, result) => {
             if (err) return reject(err);

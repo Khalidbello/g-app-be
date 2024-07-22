@@ -89,11 +89,30 @@ const removeStaff = async (req: Request, res: Response) => {
         console.error('an error occured removing  staff', err);
         res.status(500).json({ message: err });
     };
-}
+};
+
+
+// route to resend staff account activation email
+const reSendStaffActivationEmail = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignore
+        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
+        const staffEmail: string = req.params.staffEmail;
+        const resent = staffAccountVerificationLinkSender(vendorId, staffEmail);
+
+        if (!resent) throw 'An error occured resending email, reload page';
+        res.json({message: 'Emai successfully sent.'});
+    } catch (err) {
+        console.error('an error in resending staff activation email', err);
+        res.status(500).json({ message: err });
+    };
+};
+
 
 export {
     getStaffs,
     createStaff,
     editStaff,
     removeStaff,
+    reSendStaffActivationEmail,
 }
