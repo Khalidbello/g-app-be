@@ -98,6 +98,9 @@ router.get('/notifications/:limit/:pagin', (req: Request, res: Response) => getN
 
 router.get('/update-notification/:id', (req: Request, res: Response) => setNotToViewed(req, res));
 
+router.get('/set-all-notification-to-viewed', (req: Request, res: Response) => () => { });
+
+
 // router.get('/user-dp', (req: Request, res: Response) => getUserDp(req, res));
 
 export default router

@@ -96,7 +96,7 @@ const queryOrderByKey = (id: number): Promise<{ [keys: string]: string }> => {
 // query orders by last four and user id 
 const queryOrderByLastFourAndUserId = (lastFour: string, userId: number) => {
     return new Promise<orderType[]>((resolve, reject) => {
-        const query = 'SELECT * FROM orders WHERE last_four = ? AND user_id = ? AND status = ?';
+        const query = 'SELECT * FROM orders WHERE last_four = ? AND user_id = ?';
 
         pool.query(query, [lastFour, userId, 'bagged'], (err, result) => {
             if (err) return reject(err);
@@ -110,9 +110,9 @@ const queryOrderByLastFourAndUserId = (lastFour: string, userId: number) => {
 // query to retunr order excluding
 const queryOrderByUserIdExLastFour = (userId: number, lastFour: string) => {
     return new Promise((resolve, reject) => {
-        const query = 'SELECT * FROM orders WHERE last_four != ? AND user_id = ? AND status = ?';
+        const query = 'SELECT * FROM orders WHERE last_four != ? AND user_id = ? AND status != ? ORDER BY created_date DESC LIMIT ?';
 
-        pool.query(query, [lastFour, userId, 'bagged'], (err, result) => {
+        pool.query(query, [lastFour, userId, 'delivered', 20], (err, result) => {
             if (err) return reject(err);
 
             resolve(result);
