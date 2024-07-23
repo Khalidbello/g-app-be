@@ -14,6 +14,22 @@ const queryChangeStaffPassword = (staffId: number, newPassword: string) => {
 };
 
 
+// query to update product availability
+const queryUpdateProductAvailability = (vendorId: number, availability: boolean, productId: number, updaterId: number) => {
+    return new Promise<boolean>((resolve, reject) => {
+        const query = 'UPDATE prodcucts SET availability = ? avail_updated_by = ? WHERE id = ? AND vendor_id = ?';
+
+        pool.query(query, [availability, updaterId, productId, vendorId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
+
+
+
 export {
     queryChangeStaffPassword,
+    queryUpdateProductAvailability,
 };

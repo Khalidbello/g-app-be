@@ -8,7 +8,7 @@ import auth from './routes/auth';
 import admin from './routes/admin';
 import users from './routes/users';
 import paymentGateWay from './routes/gateway';
-import vendors from './routes/vendor';
+import vendors from './routes/staffs';
 import cors from 'cors';
 import session from 'express-session';
 import { initiateConnection } from './modules/connectdb';

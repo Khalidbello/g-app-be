@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { CustomSessionData } from "../types/session-types";
-import { getBaggedByLastFourAndUserId, getBaggedOrders, getPaidOrders, orderToBagged, orderToDelivered } from "../handlers/vendor/orders";
-import { activateAccount, checkVerificationCode } from "../handlers/vendor/account-activation";
-import { changePassword } from "../handlers/vendor/settings";
+import { getBaggedByLastFourAndUserId, getBaggedOrders, getPaidOrders, orderToBagged, orderToDelivered } from "../handlers/staffs/orders";
+import { activateAccount, checkVerificationCode } from "../handlers/staffs/account-activation";
+import { changePassword, changeProductAvailability } from "../handlers/staffs/settings";
 
 const router = Router();
 
@@ -46,6 +46,8 @@ router.patch('/update-order-to-delivered/:orderKey', (req: Request, res: Respons
 // routes related to settings
 
 router.post('/change-password', (req: Request, res: Response) => changePassword(req, res));
+
+router.post('/update-product-availability', (req: Request, res: Response) => changeProductAvailability(req, res));
 
 
 export default router;
