@@ -3,6 +3,9 @@ import { checkUserExist, createNewUser } from '../services/users/users-queries';
 import { CustomSessionData } from './../types/session-types';
 import { queryStaff } from '../services/staffs/auth-queries';
 import { queryAdmin } from '../services/admin/auth-query';
+import emailOtpSender from '../modules/emailers/email-otp';
+import otpGenerator from '../modules/opt-generator';
+import { queryDeleteOtp, queryOtp } from '../services/otp-queries';
 
 
 // function to handle user login
@@ -112,9 +115,64 @@ const createAccountHandler = async (req: Request, res: Response) => {
     };
 };
 
+
+
+//==================================================================================================================================
+// password recovery related handlers
+
+
+// function to checkif user exist for password recovery
+const passwordRecoveryCheckUser = async (req: Request, res: Response) => {
+    try {
+        const email: string = req.body.email;
+        const exist = await checkUserExist(email);
+
+
+        if (!exist) return res.status(404).json({ message: 'user with credentials not found.' });
+
+        // ts-ignore
+        const opt: number = await otpGenerator(exist.id);
+        // send otp email
+        emailOtpSender(email, exist.first_name, opt);
+
+        res.json({ message: 'user exist' });
+    } catch (err) {
+        console.error('error in passwordRecoveryCheckUser', err);
+        res.status(500).json({ message: 'An error occured trying to find account' });
+    };
+};
+
+
+
+// function to confirm otp if valid retrun user password
+const passwordRecoveryConfirmOtp = async (req: Request, res: Response) => {
+    try {
+        const otp = req.body.otp;
+        const email = req.body.email;
+
+        if (!email || !otp) return res.status(400).json({ message: 'incomlete data sent to server' });
+
+        const user = await checkUserExist(email);
+        const dbOtp = await queryOtp(user.id);
+        const equal: boolean = otp === dbOtp?.otp;
+
+        if (!equal) return res.status(401).json({ status: equal });
+
+        await queryDeleteOtp(user.id);
+
+        res.json({ password: user.password });
+    } catch (err) {
+        console.error('error in passwordRecoveryCheckUser', err);
+        res.status(500).json({ message: 'An error occured tryng get user password' });
+    };
+};
+
+
 export {
     logInHandler,
     createAccountHandler,
     handleStaffLogin,
     handleAdminLogin,
+    passwordRecoveryCheckUser,
+    passwordRecoveryConfirmOtp,
 };

@@ -1,46 +1,19 @@
 import { Router, Request, Response } from 'express';
-import { logInHandler, createAccountHandler, handleStaffLogin, handleAdminLogin } from './../handlers/auth';
+import { logInHandler, createAccountHandler, handleStaffLogin, handleAdminLogin, passwordRecoveryCheckUser, passwordRecoveryConfirmOtp } from './../handlers/auth';
 import pool from '../modules/connectdb';
 
 const router = Router();
 
-router.post('/login', (req: Request, res: Response) => {
-    try {
-        logInHandler(req, res);
-    } catch (err) {
-        console.error('an error occured in login');
-        res.status(500).json({ message: err });
-    };
-});
+router.post('/login', (req: Request, res: Response) => logInHandler(req, res));
 
+router.post('/create-acount', (req: Request, res: Response) => createAccountHandler(req, res));
 
-router.post('/create-acount', (req: Request, res: Response) => {
-    try {
-        createAccountHandler(req, res);
-    } catch (err) {
-        console.error('error in create account', err);
-        res.status(500).json({ message: err });
-    };
-});
+router.post('/staff-login', (req: Request, res: Response) => handleStaffLogin(req, res));
 
+router.post('/admin-login', (req: Request, res: Response) => handleAdminLogin(req, res));
 
-router.post('/staff-login', (req: Request, res: Response) => {
-    try {
-        handleStaffLogin(req, res);
-    } catch (err) {
-        console.error('an error occured in login');
-        res.status(500).json({ message: err });
-    };
-});
+router.post('/password-recovery-email', (req: Request, res: Response) => passwordRecoveryCheckUser(req, res));
 
-
-router.post('/admin-login', (req: Request, res: Response) => {
-    try {
-        handleAdminLogin(req, res);
-    } catch (err) {
-        console.error('an error occured in login');
-        res.status(500).json({ message: err });
-    };
-});
+router.post('/password-recovery-otp', (req: Request, res: Response) => passwordRecoveryConfirmOtp(req, res));
 
 export default router
