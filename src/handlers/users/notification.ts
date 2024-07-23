@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CustomSessionData } from "../../types/session-types";
-import { queryUserCountUnViewedNoti, queryUserNotifications, userQueryUpdateNoteToViewed, userQueryUpdateNoteToViewedById } from "../../services/users/notifications-queries";
+import { querySetAllNotificationViewd, queryUserCountUnViewedNoti, queryUserNotifications, userQueryUpdateNoteToViewed, userQueryUpdateNoteToViewedById } from "../../services/users/notifications-queries";
 
 const checkUnViewedNotiication = async (req: Request, res: Response) => {
     try {
