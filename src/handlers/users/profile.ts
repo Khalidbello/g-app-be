@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { queryUpdatePassword, queryUpdateUserDp, queryUpdateUserNames, queryUserProfile, queryUserSaveDp } from "../../services/users/profile-queries";
+import { queryUpdatePassword, queryUpdateUserDp, queryUpdateUserNames, queryUserDp, queryUserProfile, queryUserSaveDp } from "../../services/users/profile-queries";
 import { CustomSessionData } from "../../types/session-types";
 import * as fs from 'fs/promises';
 import formidable from 'formidable';
@@ -81,21 +81,13 @@ const userDpUpload = async (req: Request, res: Response) => {
         });
 
         const userId = (req.session as CustomSessionData).user?.id;
-        // @ts-ignore
         const file = data.files.dp[0];
 
         if (!userId || !file) return res.status(400).json({ message: 'Incomplete data sent to server for processing' });
 
         const imageBuffer = await fs.readFile(file.filepath);
-        // @ts-ignore
-        const dpExists = await queryUserDp(parseInt(userId));
-        let saved;
 
-        if (dpExists) {
-            saved = queryUpdateUserDp(userId, imageBuffer);
-        } else {
-            saved = queryUserSaveDp(userId, imageBuffer);
-        };
+        const saved = queryUpdateUserDp(userId, imageBuffer);
 
         if (!saved) throw 'Error saving user dp';
 
@@ -110,8 +102,8 @@ const userDpUpload = async (req: Request, res: Response) => {
 // route to retunr user profile pucture 
 const getUserDp = async (req: Request, res: Response) => {
     try {
-        const userId = (req.session as CustomSessionData).user?.id;
         // @ts-ignore
+        const userId: number = (req.session as CustomSessionData).user?.id;
         const userDp = await queryUserDp(userId);
 
         if (!userDp) return res.status(404).json({ message: 'not dp found' });

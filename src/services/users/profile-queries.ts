@@ -77,7 +77,7 @@ const queryUpdateUserNames = (userId: number, firstName: string, lastName: strin
 // query chck if user has dp
 const queryUserDp = (userId: number): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
-        const query = 'SELECT * FROM user_dp WHERE id = ? LIMIT 1';
+        const query = 'SELECT  FROM user_dp WHERE id = ? LIMIT 1';
 
         pool.query(query, [userId], (err, result) => {
             if (err) return reject(err);
@@ -103,7 +103,7 @@ const queryUserSaveDp = (userId: number, imageBuffer: Buffer) => {
 // to update user dp
 const queryUpdateUserDp = (userId: number, imageBuffer: Buffer) => {
     return new Promise<boolean>((resolve, reject) => {
-        const query = 'UPDATE user_dp SET dp = ? WHERE user_id = ?';
+        const query = 'UPDATE users SET image = ? WHERE id = ?';
 
         pool.query(query, [imageBuffer, userId], (err, result) => {
             if (err) return reject(err);
