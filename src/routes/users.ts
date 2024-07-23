@@ -6,7 +6,7 @@ import { initiateNewOrder, getOrderById, getOrders } from '../handlers/users/ord
 import { confirmEmailOtp, generateConfirmEmailOtp, getCheckEmailVerify } from '../handlers/users/email-verification';
 import { getUserProfileData, handleChangeNames, handleChangePassword } from '../handlers/users/profile';
 import { generateOneTimeAcc } from '../handlers/gateway';
-import { checkUnViewedNotiication, getNotifications, setNotToViewed } from '../handlers/users/notification';
+import { checkUnViewedNotiication, getNotifications, setAllNotificationToViewed, setNotToViewed } from '../handlers/users/notification';
 import { getProducts, getVendorInfo, getVendors } from '../handlers/users/user-vendors';
 
 
@@ -98,7 +98,7 @@ router.get('/notifications/:limit/:pagin', (req: Request, res: Response) => getN
 
 router.get('/update-notification/:id', (req: Request, res: Response) => setNotToViewed(req, res));
 
-router.get('/set-all-notification-to-viewed', (req: Request, res: Response) => () => { });
+router.get('/set-all-notification-to-viewed', (req: Request, res: Response) => setAllNotificationToViewed(req, res));
 
 
 // router.get('/user-dp', (req: Request, res: Response) => getUserDp(req, res));

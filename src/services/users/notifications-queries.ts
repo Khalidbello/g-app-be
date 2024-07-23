@@ -55,7 +55,7 @@ const userQueryUpdateNoteToViewed = (userId: number) => {
 };
 
 
-// query to set all unviewed notification to viewd
+// query to set  unviewed notification to viewed by id
 const userQueryUpdateNoteToViewedById = (userId: number, id: number) => {
     return new Promise<boolean>((resolve, reject) => {
         const query = 'UPDATE notifications SET viewed = true WHERE user_id = ? AND viewed = false AND id = ?';
@@ -68,6 +68,19 @@ const userQueryUpdateNoteToViewedById = (userId: number, id: number) => {
 };
 
 
+// query to set all notification to viewed
+const querySetAllNotificationViewd = (userId: number) => {
+    return new Promise<boolean>((resolve, reject) => {
+        const query = 'UPDATE notifications SET viewed = true WHERE user_id = ? AND viewed = false';
+
+        pool.query(query, [userId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
+
 
 
 export {
@@ -75,5 +88,6 @@ export {
     queryUserCountUnViewedNoti,
     queryUserNotifications,
     userQueryUpdateNoteToViewed,
-    userQueryUpdateNoteToViewedById
+    userQueryUpdateNoteToViewedById,
+    querySetAllNotificationViewd,
 };

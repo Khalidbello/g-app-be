@@ -48,7 +48,23 @@ const setNotToViewed = (req: Request, res: Response) => {
 
         res.json({ message: 'notifications updated' });
     } catch (err) {
-        console.error('error in updating all notifiaion to viwed', err);
+        console.error('error in updating notifiaion to viwed', err);
+        res.status(500).json({ message: err });
+    };
+};
+
+
+// handler to set all user notification to viewd
+const setAllNotificationToViewed = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignores
+        const userId: number = (req.session as CustomSessionData).user?.id;
+        const updated = await querySetAllNotificationViewd(userId);
+
+        if (!updated) throw 'Something went wrong';
+        res.json({ message: 'All notifications updated to viewed' });
+    } catch (err) {
+        console.error('error in updating all notifiaion to viewed', err);
         res.status(500).json({ message: err });
     };
 };
@@ -57,5 +73,6 @@ const setNotToViewed = (req: Request, res: Response) => {
 export {
     checkUnViewedNotiication,
     getNotifications,
-    setNotToViewed
+    setNotToViewed,
+    setAllNotificationToViewed,
 };
