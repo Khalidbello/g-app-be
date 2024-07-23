@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { logInHandler, createAccountHandler, handleStaffLogin, handleAdminLogin, passwordRecoveryCheckUser, passwordRecoveryConfirmOtp } from './../handlers/auth';
+import { logInHandler, createAccountHandler, handleStaffLogin, handleAdminLogin, passwordRecoveryCheckUser, passwordRecoveryConfirmOtp, passwordRecoveryCheckStaff, passwordRecoveryConfirmOtpStaff, passwordRecoveryCheckAdmin, passwordRecoveryConfirmOtpAdmin } from './../handlers/auth';
 import pool from '../modules/connectdb';
 
 const router = Router();
@@ -15,5 +15,16 @@ router.post('/admin-login', (req: Request, res: Response) => handleAdminLogin(re
 router.post('/password-recovery-email', (req: Request, res: Response) => passwordRecoveryCheckUser(req, res));
 
 router.post('/password-recovery-otp', (req: Request, res: Response) => passwordRecoveryConfirmOtp(req, res));
+
+
+router.post('staff-/password-recovery-email', (req: Request, res: Response) => passwordRecoveryCheckStaff(req, res));
+
+router.post('/staff-password-recovery-otp', (req: Request, res: Response) => passwordRecoveryConfirmOtpStaff(req, res));
+
+
+router.post('/admin-password-recovery-email', (req: Request, res: Response) => passwordRecoveryCheckAdmin(req, res));
+
+router.post('/admin-password-recovery-otp', (req: Request, res: Response) => passwordRecoveryConfirmOtpAdmin(req, res));
+
 
 export default router

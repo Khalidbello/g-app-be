@@ -168,6 +168,98 @@ const passwordRecoveryConfirmOtp = async (req: Request, res: Response) => {
 };
 
 
+// password recovery for staaffs
+
+// function to checkif user exist for password recovery
+const passwordRecoveryCheckStaff = async (req: Request, res: Response) => {
+    try {
+        const { email, vendorId } = req.body;
+        const staff = await queryStaff(email, vendorId);
+
+        if (!staff) return res.status(404).json({ message: 'user with credentials not found.' });
+
+        const opt: number = await otpGenerator(staff.id);
+        // send otp email
+        emailOtpSender(email, staff.first_name, opt);
+
+        res.json({ message: 'staff exist' });
+    } catch (err) {
+        console.error('error in passwordRecoveryCheckStaff', err);
+        res.status(500).json({ message: 'An error occured trying to find account' });
+    };
+};
+
+
+
+// function to confirm otp if valid return staff password
+const passwordRecoveryConfirmOtpStaff = async (req: Request, res: Response) => {
+    try {
+        const { email, vendorId, otp } = req.body;
+
+        if (!email || !vendorId || !otp) return res.status(400).json({ message: 'incomlete data sent to server' });
+
+        const staff = await queryStaff(email, vendorId);
+        const dbOtp = await queryOtp(staff.id);
+        const equal: boolean = otp === dbOtp?.otp;
+
+        if (!equal) return res.status(401).json({ status: equal });
+
+        await queryDeleteOtp(staff.id);
+
+        res.json({ password: staff.password });
+    } catch (err) {
+        console.error('error in passwordRecoveryCheckUser', err);
+        res.status(500).json({ message: 'An error occured tryng get user password' });
+    };
+};
+
+
+// for admin password recovery 
+
+// function to checkif user exist for password recovery
+const passwordRecoveryCheckAdmin = async (req: Request, res: Response) => {
+    try {
+        const { email, vendorId } = req.body;
+        const admin = await queryAdmin(email, vendorId);
+
+        if (!admin) return res.status(404).json({ message: 'admin with credentials not found.' });
+
+        const opt: number = await otpGenerator(admin.id);
+        // send otp email
+        emailOtpSender(email, admin.first_name, opt);
+
+        res.json({ message: 'admin exist' });
+    } catch (err) {
+        console.error('error in passwordRecoveryCheckAdmin', err);
+        res.status(500).json({ message: 'An error occured trying to find account' });
+    };
+};
+
+
+
+// function to confirm otp if valid return staff password
+const passwordRecoveryConfirmOtpAdmin = async (req: Request, res: Response) => {
+    try {
+        const { email, vendorId, otp } = req.body;
+
+        if (!email || !vendorId || !otp) return res.status(400).json({ message: 'incomlete data sent to server' });
+
+        const admin = await queryAdmin(email, vendorId);
+        const dbOtp = await queryOtp(admin.id);
+        const equal: boolean = otp === dbOtp?.otp;
+
+        if (!equal) return res.status(401).json({ status: equal });
+
+        await queryDeleteOtp(admin.id);
+
+        res.json({ password: admin.password });
+    } catch (err) {
+        console.error('error in passwordRecoveryCheckUser', err);
+        res.status(500).json({ message: 'An error occured tryng get user password' });
+    };
+};
+
+
 export {
     logInHandler,
     createAccountHandler,
@@ -175,4 +267,8 @@ export {
     handleAdminLogin,
     passwordRecoveryCheckUser,
     passwordRecoveryConfirmOtp,
+    passwordRecoveryCheckStaff,
+    passwordRecoveryConfirmOtpStaff,
+    passwordRecoveryCheckAdmin,
+    passwordRecoveryConfirmOtpAdmin,
 };
