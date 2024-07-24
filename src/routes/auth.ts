@@ -27,4 +27,16 @@ router.post('/admin-password-recovery-email', (req: Request, res: Response) => p
 router.post('/admin-password-recovery-otp', (req: Request, res: Response) => passwordRecoveryConfirmOtpAdmin(req, res));
 
 
-export default router
+router.post('/logout', (req: Request, res: Response) => {
+    try {
+        req.session.destroy(() => {
+            res.json({ message: 'Logged out' });
+        });
+    } catch (err) {
+        console.log('erorr loging out');
+        res.status(500).json({ message: 'Failed to logout' });
+    }
+});
+
+
+export default router;
