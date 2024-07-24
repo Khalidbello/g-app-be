@@ -17,7 +17,7 @@ router.post('/password-recovery-email', (req: Request, res: Response) => passwor
 router.post('/password-recovery-otp', (req: Request, res: Response) => passwordRecoveryConfirmOtp(req, res));
 
 
-router.post('staff-/password-recovery-email', (req: Request, res: Response) => passwordRecoveryCheckStaff(req, res));
+router.post('/staff-password-recovery-email', (req: Request, res: Response) => passwordRecoveryCheckStaff(req, res));
 
 router.post('/staff-password-recovery-otp', (req: Request, res: Response) => passwordRecoveryConfirmOtpStaff(req, res));
 

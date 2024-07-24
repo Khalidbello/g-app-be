@@ -32,7 +32,7 @@ const generateConfirmEmailOtp = async (req: Request, res: Response) => {
         const { email } = req.body;
 
         const profileData = await queryUserProfile(userId)
-        const opt: number = await otpGenerator(userId);
+        const opt: number = await otpGenerator(userId, 'user', 0);
         emailOtpSender(email, profileData.first_name, opt);
 
         res.json({ status: 'ok' })

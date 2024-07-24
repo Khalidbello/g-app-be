@@ -5,7 +5,7 @@ import { queryStaff } from '../services/staffs/auth-queries';
 import { queryAdmin } from '../services/admin/auth-query';
 import emailOtpSender from '../modules/emailers/email-otp';
 import otpGenerator from '../modules/opt-generator';
-import { queryDeleteOtp, queryOtp } from '../services/otp-queries';
+import { queryDeleteOtp, queryOtp, queryStaffOtp } from '../services/otp-queries';
 
 
 // function to handle user login
@@ -131,7 +131,7 @@ const passwordRecoveryCheckUser = async (req: Request, res: Response) => {
         if (!exist) return res.status(404).json({ message: 'user with credentials not found.' });
 
         // ts-ignore
-        const opt: number = await otpGenerator(exist.id);
+        const opt: number = await otpGenerator(exist.id, 'user', 0);
         // send otp email
         emailOtpSender(email, exist.first_name, opt);
 
@@ -178,7 +178,7 @@ const passwordRecoveryCheckStaff = async (req: Request, res: Response) => {
 
         if (!staff) return res.status(404).json({ message: 'user with credentials not found.' });
 
-        const opt: number = await otpGenerator(staff.id);
+        const opt: number = await otpGenerator(staff.id, 'staff', vendorId);
         // send otp email
         emailOtpSender(email, staff.first_name, opt);
 
@@ -199,7 +199,7 @@ const passwordRecoveryConfirmOtpStaff = async (req: Request, res: Response) => {
         if (!email || !vendorId || !otp) return res.status(400).json({ message: 'incomlete data sent to server' });
 
         const staff = await queryStaff(email, vendorId);
-        const dbOtp = await queryOtp(staff.id);
+        const dbOtp = await queryStaffOtp(staff.id, 'staff', vendorId);
         const equal: boolean = otp === dbOtp?.otp;
 
         if (!equal) return res.status(401).json({ status: equal });
@@ -224,7 +224,7 @@ const passwordRecoveryCheckAdmin = async (req: Request, res: Response) => {
 
         if (!admin) return res.status(404).json({ message: 'admin with credentials not found.' });
 
-        const opt: number = await otpGenerator(admin.id);
+        const opt: number = await otpGenerator(admin.id, 'admin', vendorId);
         // send otp email
         emailOtpSender(email, admin.first_name, opt);
 
@@ -245,7 +245,7 @@ const passwordRecoveryConfirmOtpAdmin = async (req: Request, res: Response) => {
         if (!email || !vendorId || !otp) return res.status(400).json({ message: 'incomlete data sent to server' });
 
         const admin = await queryAdmin(email, vendorId);
-        const dbOtp = await queryOtp(admin.id);
+        const dbOtp = await queryStaffOtp(admin.id, 'admin', vendorId);
         const equal: boolean = otp === dbOtp?.otp;
 
         if (!equal) return res.status(401).json({ status: equal });
