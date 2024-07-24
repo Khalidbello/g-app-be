@@ -28,14 +28,14 @@ const changeProductAvailability = async (req: Request, res: Response) => {
 const changePassword = async (req: Request, res: Response) => {
     try {
         // @ts-ignore
-        const staffId: number = (req.session as CustomSessionData).user?.vendorId;
+        const staffId: number = (req.session as CustomSessionData).user?.id;
         const { password, newPassword, confirmNewPassword } = req.body;
 
         if (!password || !newPassword || !confirmNewPassword) return res.status(400).json({ message: 'Incomplete data sent to server for processing' });
 
         const staffInfo = await queryStaffData(staffId);
 
-        if (staffInfo.password !== newPassword) return res.status(402).json({ message: 'password does not match' });
+        if (staffInfo.password !== password) return res.status(402).json({ message: 'password does not match' });
 
         const updated = await queryChangeStaffPassword(staffId, newPassword);
 
