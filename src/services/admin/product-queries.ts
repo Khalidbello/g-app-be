@@ -124,6 +124,21 @@ const queryDeleteProduct = (productId: number, vendorId: number) => {
     });
 };
 
+
+// query to update product availability
+const queryUpdateProductAvailability = (updaterId: number, vendorId: number, productId: number, available: boolean) => {
+    return new Promise<boolean>((resolve, reject) => {
+        const query = 'UPDATE products SET available = ?, last_avail_by = ? WHERE id = ? AND vendor_id = ?';
+
+        pool.query(query, [available, updaterId, productId, vendorId], (err, result) => {
+            if (err) return reject(err);
+
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
+
+
 export {
     queryProducts,
     queryProductInfoByIndexAndVendorId,
@@ -133,4 +148,5 @@ export {
     queryUpdateProductImaage,
     queryEditProduct,
     queryDeleteProduct,
+    queryUpdateProductAvailability,
 }

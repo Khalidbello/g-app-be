@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import { CustomSessionData } from "../../types/session-types";
-import { queryAddNewProduct, queryDeleteProduct, queryEditProduct, queryProductInfoByIndexAndVendorId, queryProducts, queryProdutImageExists, queryUpdateProductImaage } from "../../services/admin/product-queries";
+import { queryAddNewProduct, queryDeleteProduct, queryEditProduct, queryProductInfoByIndexAndVendorId, queryProducts, queryProdutImageExists, queryUpdateProductAvailability, queryUpdateProductImaage } from "../../services/admin/product-queries";
 import * as fs from 'fs/promises';
 import formidable from 'formidable';
 
@@ -123,10 +123,30 @@ const deleteProduct = async (req: Request, res: Response) => {
 };
 
 
+// query to update product availability
+const editProductAvailability = async (req: Request, res: Response) => {
+    try {
+        // @ts-ignore
+        const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
+        // @ts-ignore
+        const adminId: number = (req.session as CustomSessionData).user?.id;
+        const { available, productId } = req.body;
+        const updated = queryUpdateProductAvailability(adminId, vendorId, productId, available);
+
+        if (!updated) throw 'An erorr occured updating product availability';
+        res.json({ message: 'Product availability updated successfully' });
+    } catch (err) {
+        console.error('an error occured in updating product availability', err);
+        res.status(500).json({ message: err });
+    };
+};
+
+
 export {
     addNewProduct,
     updateProductImage,
     getProducts,
     editProduct,
     deleteProduct,
+    editProductAvailability,
 };
