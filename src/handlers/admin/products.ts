@@ -129,9 +129,9 @@ const editProductAvailability = async (req: Request, res: Response) => {
         // @ts-ignore
         const vendorId: number = (req.session as CustomSessionData).user?.vendorId;
         // @ts-ignore
-        const adminId: number = (req.session as CustomSessionData).user?.id;
+        const updaterId: number = (req.session as CustomSessionData).user?.id;
         const { available, productId } = req.body;
-        const updated = queryUpdateProductAvailability(adminId, vendorId, productId, available);
+        const updated = queryUpdateProductAvailability(updaterId, vendorId, productId, available);
 
         if (!updated) throw 'An erorr occured updating product availability';
         res.json({ message: 'Product availability updated successfully' });

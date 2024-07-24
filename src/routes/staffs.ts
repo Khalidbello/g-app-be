@@ -3,7 +3,7 @@ import { CustomSessionData } from "../types/session-types";
 import { getBaggedByLastFourAndUserId, getBaggedOrders, getPaidOrders, orderToBagged, orderToDelivered } from "../handlers/staffs/orders";
 import { activateAccount, checkVerificationCode } from "../handlers/staffs/account-activation";
 import { changePassword, changeProductAvailability } from "../handlers/staffs/settings";
-import { getProducts } from "../handlers/admin/products";
+import { editProductAvailability, getProducts } from "../handlers/admin/products";
 import { getVendorinfo } from "../handlers/admin/vendor-info";
 
 const router = Router();
@@ -56,6 +56,8 @@ router.post('/update-product-availability', (req: Request, res: Response) => cha
 // route to fethc and set product availability for staff ui
 
 router.get('/products/:pagin/:limit', (req: Request, res: Response) => getProducts(req, res));
+
+router.post('/change-availability', (req: Request, res: Response) => editProductAvailability(req, res));
 
 
 export default router;
